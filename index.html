@@ -149,11 +149,10 @@ a{color:var(--sea)}
     </div>
 
     <details class="sub-details">
-      <summary>הגדרות סירה ותרחיש</summary>
+      <summary>הגדרות סירה ומכשיר</summary>
       <div class="grid">
         <div><label for="pt">זווית צמודה מינימלית<span class="hint">מה שהמכשיר (AWA) מראה בשיוט צמוד</span></label><input id="pt" type="number" inputmode="decimal" min="15" max="80" step="1"></div>
         <div><label for="wst">עוצמת הרוח שאני מזין<span class="hint">לפי מה שמוצג במכשיר</span></label><select id="wst"><option value="T">TWS – רוח אמיתית</option><option value="A">AWS – רוח נראית</option></select></div>
-        <div><label for="shift">שינוי רוח לתרחיש הגרוע<span class="hint">10° עד שעה, 15° 1–3 שעות, 25° בבריזה מתפתחת</span></label><input id="shift" type="number" inputmode="decimal" min="0" max="60" step="1"></div>
       </div>
     </details>
   </section>
@@ -187,7 +186,7 @@ a{color:var(--sea)}
           </tbody>
         </table>
       </div>
-      <p class="note">סיכון = כמה מפסידים מול מנוע ישר אם הרוח משתנה לרעה. נמוך: לא מפסידים. בינוני: עד 10% מזמן ההפלגה. גבוה: יותר.</p>
+      <p class="note">סיכון = כמה מפסידים מול מנוע ישר אם המפרשים לא מוסיפים מהירות (למשל הרוח נחלשת או משנה כיוון). נמוך: עד 5% מזמן ההפלגה. בינוני: עד 10%. גבוה: יותר.</p>
     </details>
   </section>
 
@@ -205,7 +204,8 @@ a{color:var(--sea)}
       <summary>הנחות ובטיחות</summary>
       <ul class="plain">
         <li>החישוב מניח מהירות קבועה. זרם צולב וגלים מהחרטום יכולים להפוך את ההמלצה, לכן כדאי לבדוק בשטח במצב GPS.</li>
-        <li>שינוי רוח מחושב ברגע הפנייה. אם הרוח סוגרת כבר בקטע הראשון, ההפסד יכול להיות גדול יותר.</li>
+        <li>המנוע דולק כל הזמן. התרחיש הגרוע: המפרשים לא מוסיפים מהירות, ונשארים עם מהירות המנוע על דרך ארוכה יותר.</li>
+        <li>סטייה משנה את הזווית שהמכשיר מראה פחות מגודל הסטייה, כי חלק מהרוח במכשיר נוצר מהנסיעה. המחשבון מחשב את זה לבד.</li>
         <li>בלי עוצמת רוח, המחשבון מניח שהרוח האמיתית שווה ל־AWA. זה שמרני ונוטה להמליץ על מנוע.</li>
         <li>נטייה עם מנוע דולק: עד כ־15°. מגבלת היצרן היא לרוב 20° ברציפות, בדקו בספר המנוע.</li>
         <li>בשיוט עם מנוע ומפרשים הסירה היא כלי שיט ממונע לפי החוקים, וביום מציגים חרוט הפוך.</li>
@@ -238,8 +238,8 @@ a{color:var(--sea)}
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var R = Math.PI/180;
-  var ids = ["awa","side","aws","wst","vm","vs","pt","dist","shift"];
-  var defaults = {awa:"25",side:"R",aws:"12",wst:"T",vm:"5",vs:"6",pt:"35",dist:"10",shift:"15"};
+  var ids = ["awa","side","aws","wst","vm","vs","pt","dist"];
+  var defaults = {awa:"25",side:"R",aws:"12",wst:"T",vm:"5",vs:"6",pt:"35",dist:"10"};
   var vsTouched = false, mode = "manual", bearing = null, lastBeta = null;
   var KEY = "upwind-calc-v3";
 
@@ -292,29 +292,21 @@ a{color:var(--sea)}
     return out;
   }
 
-  function worstCase(plan, d, beta, P, Vm, Vs, S){
-    var x = plan.type === "direct" ? d/2 : plan.x;
-    var a = plan.a || 0;
-    var px = x*Math.cos(a*R), py = -x*Math.sin(a*R);
-    var rx = d - px, ry = -py, dr = Math.hypot(rx, ry);
-    var th = Math.atan2(ry, rx)/R;
-    var t1 = x/Vs, worst = 0;
-    [beta + S, beta - S].forEach(function(w){
-      var rem = dr < 1e-6 ? 0 : solve(dr, relAngle(w, th), P, Vm, Vs).best.time;
-      worst = Math.max(worst, t1 + rem);
-    });
-    return {time:Math.max(worst, plan.time)};
+  // Worst case: the sails add nothing, so the planned path is covered at motor speed.
+  function worstCase(plan, d, Vm){
+    if (plan.type === "direct") return {time:d/Vm};
+    return {time:plan.dist/Vm};
   }
 
-  var names = {motor:"מנוע ישר", two:"שני קטעים במפרשים", legmotor:"קטע במפרשים ואז מנוע", direct:"מפרשים ישר ליעד"};
+  var names = {motor:"מנוע ישר", two:"זיגזג עם מפרשים", legmotor:"סטייה עם מפרשים ואז ישר", direct:"ישר ליעד עם מפרשים"};
 
   function calc(){
-    var awa = num("awa"), aws = num("aws"), vm = num("vm"), vs = num("vs"), Pa = num("pt"), d = num("dist"), S = num("shift");
+    var awa = num("awa"), aws = num("aws"), vm = num("vm"), vs = num("vs"), Pa = num("pt"), d = num("dist");
     var isTWS = $("wst").value === "T";
     $("awsLabel").firstChild.nodeValue = isTWS ? "עוצמת רוח (TWS)" : "עוצמת רוח (AWS)";
     var windRight = $("side").value === "R";
     var turn = windRight ? "שמאלה" : "ימינה";
-    if (!(awa>=0 && awa<=180) || !(vm>0) || !(vs>0) || !(Pa>=15 && Pa<=80) || !(d>0) || !(S>=0)){
+    if (!(awa>=0 && awa<=180) || !(vm>0) || !(vs>0) || !(Pa>=15 && Pa<=80) || !(d>0)){
       $("verdict").className = "verdict r";
       $("verdict").innerHTML = '<p class="vtext">חסר נתון או שהוא מחוץ לטווח. בדקו: זווית רוח 0–180, מהירויות מעל 0, זווית צמודה 15–80.</p>';
       $("chart").innerHTML = ""; $("opts").innerHTML = ""; $("derived").innerHTML = ""; $("thr").innerHTML = "";
@@ -361,7 +353,7 @@ a{color:var(--sea)}
     var res = solve(d, beta, P, vm, vs);
     var Tm = res.motor.time;
     var plans = [res.direct, res.two, res.legmotor].filter(Boolean);
-    plans.forEach(function(p){ p.worst = worstCase(p, d, beta, P, vm, vs, S); });
+    plans.forEach(function(p){ p.worst = worstCase(p, d, vm); });
     var bestPlan = plans.reduce(function(m,p){ return !m || p.time < m.time ? p : m; }, null);
     var gain = bestPlan ? Tm - bestPlan.time : 0;
 
@@ -377,16 +369,17 @@ a{color:var(--sea)}
       if (aNeed > 0 && aNeed < 85){
         text = "כדי להגיע ל־" + Math.round(Pa) + "° במכשיר צריך לסטות " + Math.round(aNeed) + "° מהיעד. בסטייה כזו צריך יותר מ־" + f1(vm/Math.cos(aNeed*R)) + " קשר עם מפרשים כדי שישתלם.";
       } else text = "בנתונים האלה הסטייה לא משתלמת.";
+      text += " גם במנוע ישר כדאי ראשי מתוח לייצוב.";
     } else {
       var worstCost = bestPlan.worst.time - Tm;
-      var riskTxt = worstCost <= 0 ? "נמוך" : worstCost <= Tm*0.10 ? "בינוני" : "גבוה";
-      cls = (gain/Tm >= 0.05 && worstCost <= Tm*0.03) ? "g" : "y";
+      var riskTxt = worstCost <= Tm*0.05 ? "נמוך" : worstCost <= Tm*0.10 ? "בינוני" : "גבוה";
+      cls = worstCost <= Tm*0.10 ? "g" : "y";
       if (bestPlan.type === "direct"){
-        title = "מפרשים ישר ליעד";
-        text = "הרוח רחבה מספיק, אין צורך להתחלף.";
+        title = "ישר ליעד עם מפרשים";
+        text = "הרוח רחבה מספיק, אין צורך לסטות.";
       } else if (bestPlan.type === "two"){
         title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°";
-        text = "קטע ראשון של " + f1(bestPlan.x) + " מייל, ואז החלפת צד וקטע של " + f1(bestPlan.L2) + " מייל ליעד.";
+        text = "קטע ראשון של " + f1(bestPlan.x) + " מייל, ואז החלפת צד וקטע של " + f1(bestPlan.L2) + " מייל ליעד, הכול עם מנוע ומפרשים.";
       } else {
         title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°, ואז מנוע ישר";
         text = "שוטו כ־" + f1(bestPlan.x) + " מייל, עד שהיעד נמצא " + Math.round(bestPlan.phi) + "° מהחרטום. משם מנוע ישר ליעד: " + f1(bestPlan.rem) + " מייל.";
@@ -400,19 +393,25 @@ a{color:var(--sea)}
         '<tr><td>מנוע ישר</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td></tr>' +
         '<tr><td><b>עם הסטייה</b></td><td><b>' + legsTxt(bestPlan, d) + '</b></td><td><b>' + fmtT(bestPlan.time) + '</b></td></tr>' +
         '</tbody></table></div>' +
-        '<p class="vtext sum"><b class="plus">חוסך ' + fmtD(gain) + '.</b> אם הרוח משתנה לרעה: ' +
-        (wc > 0 ? '<b class="minus">מוסיף ' + fmtD(wc) + '</b> מול מנוע ישר.' : '<b class="plus">עדיין חוסך ' + fmtD(-wc) + '</b>.') + '</p>';
+        '<p class="vtext sum"><b class="plus">חוסך ' + fmtD(gain) + '.</b> ' +
+        (wc > 0 ? 'אם המפרשים לא עוזרים: <b class="minus">מוסיף ' + fmtD(wc) + '</b>.' : 'גם אם המפרשים לא עוזרים, לא מפסידים.') + '</p>' +
+        (cls === "y" ? '<p class="vtext sum">צהוב: הסטייה ארוכה, ואם המפרשים לא מוסיפים מהירות ההפסד גדול. בדקו ב־GPS כבר בתחילת הסטייה שהמהירות באמת עולה.</p>' : '') +
+        '<p class="vtext sum">בונוס: עם מפרשים הסירה יציבה יותר, מתגלגלת פחות וחובטת פחות בגלים.</p>';
     }
     warns.forEach(function(w){ html += '<p class="warn">' + w + '</p>'; });
     v.className = "verdict " + cls; v.innerHTML = html;
 
     var rows = '<thead><tr><th>אפשרות</th><th>דרך (מייל)</th><th>משך</th><th>מול מנוע ישר</th></tr></thead><tbody>';
     rows += '<tr' + (!bestPlan || gain<=0 ? ' class="opt-best"' : '') + '><td>' + names.motor + '</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td><td>–</td></tr>';
+    var shown = 0;
     plans.forEach(function(p){
       var diff = Tm - p.time;
+      if (diff <= 0) return;
+      shown++;
       rows += '<tr' + (p === bestPlan && gain > 0 ? ' class="opt-best"' : '') + '><td>' + names[p.type] + '</td><td>' + legsTxt(p, d) + '</td><td>' + fmtT(p.time) + '</td>' +
         '<td class="' + (diff > 0 ? "plus" : "minus") + '">' + (diff > 0 ? "חוסך " : "מוסיף ") + fmtD(diff) + '</td></tr>';
     });
+    if (!shown) rows += '<tr><td colspan="4">אין אפשרות עם מפרשים שחוסכת זמן בנתונים האלה.</td></tr>';
     $("opts").innerHTML = rows + '</tbody>';
 
     drawChart(d, beta, windRight, (bestPlan && gain > 0) ? bestPlan : null);
@@ -563,7 +562,7 @@ a{color:var(--sea)}
   });
 
   // ---------- version check ----------
-  var APP_VERSION = "2026-10-04.4";
+  var APP_VERSION = "2026-10-04.5";
   $("ver").textContent = "גרסה " + APP_VERSION;
   function checkUpdate(){
     if (!/^https?:$/.test(location.protocol) || !navigator.onLine) return;
