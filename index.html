@@ -90,6 +90,10 @@ input:focus,select:focus,button:focus-visible{outline:3px solid var(--sea);outli
 .num b{display:block;font-size:1.25rem;font-weight:800}
 .num span{color:var(--muted);font-size:.8rem}
 .plus{color:var(--green)} .minus{color:var(--red)}
+.trip{margin-top:12px;background:var(--surface);border-radius:10px;padding:4px 8px;overflow-x:auto}
+.trip td,.trip th{padding:7px 4px}
+.trip tr:last-child td{border-bottom:0}
+.sum{margin-top:10px}
 .warn{color:var(--amber);font-size:.92rem;margin:8px 0 0;font-weight:600}
 svg{display:block;width:100%;height:auto;max-height:320px}
 .note{color:var(--muted);font-size:.88rem;margin:8px 0 0}
@@ -100,12 +104,17 @@ a{color:var(--sea)}
 .install{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--sea-soft);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:.95rem}
 .install button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:9px 14px;min-height:42px;background:var(--sea);color:#fff;cursor:pointer;flex:none}
 .install .x{background:none;color:var(--muted);padding:6px 10px}
+.ver{text-align:center;color:var(--muted);font-size:.8rem;margin:10px 0 0}
 .reset{display:block;margin:10px auto 0;font:inherit;font-weight:600;color:var(--muted);background:none;border:1.5px solid var(--line);border-radius:10px;padding:10px 18px;min-height:44px;cursor:pointer}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
 <main>
+  <div class="install" id="updateBar" hidden>
+    <span>יש גרסה חדשה של המחשבון.</span>
+    <span><button type="button" id="updateBtn">עדכון</button></span>
+  </div>
   <div class="install" id="installBar" hidden>
     <span id="installText"></span>
     <span><button type="button" id="installBtn" hidden>התקנה</button><button type="button" class="x" id="installClose" aria-label="סגירה">✕</button></span>
@@ -221,6 +230,7 @@ a{color:var(--sea)}
   </section>
 
   <button id="reset" type="button" class="reset">איפוס לברירת מחדל</button>
+  <p class="ver" id="ver"></p>
 </main>
 
 <script>
@@ -245,8 +255,15 @@ a{color:var(--sea)}
   }
 
   function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; }
-  function fmtT(h){ var m = Math.round(h*60); var hh = Math.floor(m/60), mm = m%60; return hh + ":" + (mm<10?"0":"") + mm; }
-  function fmtD(h){ var m = Math.round(Math.abs(h)*60); if (m < 60) return m + " דק'"; var hh = Math.floor(m/60), mm = m%60; return hh + ":" + (mm<10?"0":"") + mm + " ש'"; }
+  // duration as "X ש' Y דק'" (not a clock time)
+  function fmtT(h){ var m = Math.round(Math.abs(h)*60); var hh = Math.floor(m/60), mm = m%60;
+    if (hh === 0) return mm + " דק'"; if (mm === 0) return hh + " ש'"; return hh + " ש' " + mm + " דק'"; }
+  function fmtD(h){ return fmtT(h); }
+  function legsTxt(p, d){
+    if (p.type === "two") return f1(p.x) + " ואז " + f1(p.L2) + '<span class="hint">סה"כ ' + f1(p.dist) + '</span>';
+    if (p.type === "legmotor") return f1(p.x) + " ואז " + f1(p.rem) + '<span class="hint">סה"כ ' + f1(p.dist) + '</span>';
+    return f1(d);
+  }
   function f1(x){ return (Math.round(x*10)/10).toFixed(1); }
   function relAngle(w, t){ var d = ((w - t) % 360 + 540) % 360 - 180; return Math.abs(d); }
 
@@ -348,20 +365,21 @@ a{color:var(--sea)}
     var html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div><p class="vtext">' + text + '</p>';
     if (bestPlan && gain > 0){
       var wc = bestPlan.worst.time - Tm;
-      html += '<div class="nums">' +
-        '<div class="num"><b>' + fmtT(Tm) + '</b><span>מנוע ישר</span></div>' +
-        '<div class="num"><b class="plus">' + fmtD(gain) + '</b><span>רווח צפוי</span></div>' +
-        '<div class="num"><b class="' + (wc > 0 ? "minus" : "plus") + '">' + (wc > 0 ? "+" + fmtD(wc) : fmtD(wc)) + '</b><span>' + (wc > 0 ? "הפסד" : "עדיין רווח") + ' אם הרוח משתנה</span></div>' +
-        '</div>';
+      html += '<div class="trip"><table><thead><tr><th></th><th>דרך (מייל)<span class="hint">לפני הפנייה ואחריה</span></th><th>משך</th></tr></thead><tbody>' +
+        '<tr><td>מנוע ישר</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td></tr>' +
+        '<tr><td><b>עם הסטייה</b></td><td><b>' + legsTxt(bestPlan, d) + '</b></td><td><b>' + fmtT(bestPlan.time) + '</b></td></tr>' +
+        '</tbody></table></div>' +
+        '<p class="vtext sum"><b class="plus">חוסך ' + fmtD(gain) + '.</b> אם הרוח משתנה לרעה: ' +
+        (wc > 0 ? '<b class="minus">מוסיף ' + fmtD(wc) + '</b> מול מנוע ישר.' : '<b class="plus">עדיין חוסך ' + fmtD(-wc) + '</b>.') + '</p>';
     }
     warns.forEach(function(w){ html += '<p class="warn">' + w + '</p>'; });
     v.className = "verdict " + cls; v.innerHTML = html;
 
-    var rows = '<thead><tr><th>אפשרות</th><th>זמן הגעה</th><th>מול מנוע ישר</th></tr></thead><tbody>';
-    rows += '<tr' + (!bestPlan || gain<=0 ? ' class="opt-best"' : '') + '><td>' + names.motor + '</td><td>' + fmtT(Tm) + '</td><td>–</td></tr>';
+    var rows = '<thead><tr><th>אפשרות</th><th>דרך (מייל)</th><th>משך</th><th>מול מנוע ישר</th></tr></thead><tbody>';
+    rows += '<tr' + (!bestPlan || gain<=0 ? ' class="opt-best"' : '') + '><td>' + names.motor + '</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td><td>–</td></tr>';
     plans.forEach(function(p){
       var diff = Tm - p.time;
-      rows += '<tr' + (p === bestPlan && gain > 0 ? ' class="opt-best"' : '') + '><td>' + names[p.type] + '</td><td>' + fmtT(p.time) + '</td>' +
+      rows += '<tr' + (p === bestPlan && gain > 0 ? ' class="opt-best"' : '') + '><td>' + names[p.type] + '</td><td>' + legsTxt(p, d) + '</td><td>' + fmtT(p.time) + '</td>' +
         '<td class="' + (diff > 0 ? "plus" : "minus") + '">' + (diff > 0 ? "חוסך " : "מוסיף ") + fmtD(diff) + '</td></tr>';
     });
     $("opts").innerHTML = rows + '</tbody>';
@@ -515,6 +533,26 @@ a{color:var(--sea)}
     ids.forEach(function(k){ $(k).value = defaults[k]; });
     vsTouched = false; bearing = null; calc(); showVmc();
   });
+
+  // ---------- version check ----------
+  var APP_VERSION = "2026-10-04.3";
+  $("ver").textContent = "גרסה " + APP_VERSION;
+  function checkUpdate(){
+    if (!/^https?:$/.test(location.protocol) || !navigator.onLine) return;
+    fetch("./index.html?check=" + Date.now(), {cache:"no-store"})
+      .then(function(r){ return r.ok ? r.text() : ""; })
+      .then(function(t){
+        var m = t.match(/APP_VERSION = "([^"]+)"/);
+        if (m && m[1] !== APP_VERSION) $("updateBar").hidden = false;
+      }).catch(function(){});
+  }
+  $("updateBtn").addEventListener("click", function(){
+    var go = function(){ location.reload(); };
+    if ("caches" in window) caches.delete("upwind-cache").then(go, go); else go();
+  });
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible") checkUpdate(); });
+  window.addEventListener("online", checkUpdate);
+  setTimeout(checkUpdate, 1500);
 
   // ---------- install & offline ----------
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){

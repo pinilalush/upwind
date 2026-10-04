@@ -1,4 +1,4 @@
-// Offline support. The page is fetched from the network first (so updates
+// v3 – Offline support. The page is fetched from the network first (so updates
 // arrive automatically), with the saved copy used when there is no signal.
 const CACHE = "upwind-cache";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
@@ -21,10 +21,11 @@ self.addEventListener("fetch", (e) => {
     return;
   }
   if (url.origin !== self.location.origin) return;
+  if (url.searchParams.has("check")) return; // version check always goes to the network
 
   // App files: network first (4 s), then saved copy.
   e.respondWith(
-    Promise.race([fetch(req, {cache: "no-cache"}), timeout(4000)])
+    Promise.race([fetch(req.url, {cache: "no-cache", credentials: "same-origin"}), timeout(4000)])
       .then((res) => {
         if (res && res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
         return res;
