@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F5F8B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="מנוע או מפרש">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>מנוע או מפרש נגד הרוח – מחשבון סקיפר</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F6; --surface:#FFFFFF; --ink:#10263A; --muted:#5B6F80; --line:#C9D6DF;
+  --sea:#1F5F8B; --sea-soft:#DCE9F2; --green:#1E7A4C; --amber:#A86B12; --red:#B83A3A;
+  --green-soft:#DDF1E6; --amber-soft:#F7EBD3; --red-soft:#F6DEDE;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1A26; --surface:#13293A; --ink:#E3ECF2; --muted:#8FA5B5; --line:#24425A;
+    --sea:#6FB3E0; --sea-soft:#183850; --green:#4CC38A; --amber:#E6B450; --red:#EE6B6B;
+    --green-soft:#16382A; --amber-soft:#3A2F16; --red-soft:#3D1D22;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1A26; --surface:#13293A; --ink:#E3ECF2; --muted:#8FA5B5; --line:#24425A;
+  --sea:#6FB3E0; --sea-soft:#183850; --green:#4CC38A; --amber:#E6B450; --red:#EE6B6B;
+  --green-soft:#16382A; --amber-soft:#3A2F16; --red-soft:#3D1D22;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Assistant",Arial,"Segoe UI",sans-serif;font-size:17px;line-height:1.5;font-variant-numeric:tabular-nums}
+main{max-width:720px;margin:0 auto;padding:18px 16px 40px}
+h1{font-size:1.7rem;font-weight:800;line-height:1.15;margin:4px 0 4px}
+.sub{color:var(--muted);margin:0 0 16px}
+h2{font-size:1.15rem;font-weight:700;margin:0 0 10px}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+details summary{cursor:pointer;font-weight:700;font-size:1.05rem;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:28px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";font-size:1.4rem;color:var(--muted);line-height:1}
+details[open] summary::after{content:"–"}
+details[open] summary{margin-bottom:10px}
+.sub-details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.sub-details summary{font-size:.98rem;font-weight:600;color:var(--muted)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:right;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.risk{display:inline-block;padding:1px 9px;border-radius:999px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.r-low{background:var(--green-soft);color:var(--green)}
+.r-mid{background:var(--amber-soft);color:var(--amber)}
+.r-high{background:var(--red-soft);color:var(--red)}
+.legend{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-weight:600;font-size:.95rem;margin-bottom:4px}
+.hint{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+input,select{width:100%;font:inherit;font-size:1.15rem;font-weight:700;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);min-height:48px}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--sea);outline-offset:1px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
+.seg button{font:inherit;font-weight:700;padding:11px;border:0;background:var(--bg);color:var(--muted);min-height:46px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--sea);color:#fff}
+.auto{background:var(--sea-soft);border-radius:12px;padding:12px;margin-bottom:14px}
+.live{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.live div{background:var(--surface);border-radius:10px;padding:8px 10px}
+.live b{display:block;font-size:1.5rem;font-weight:800;line-height:1.2}
+.live span{color:var(--muted);font-size:.8rem}
+.btn{display:block;width:100%;font:inherit;font-weight:700;padding:12px;border-radius:10px;border:1.5px solid var(--sea);background:var(--surface);color:var(--sea);min-height:48px;cursor:pointer;margin-top:8px;text-align:right}
+.btn small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.msg{font-size:.9rem;margin:8px 0 0}
+.vmc{margin-top:10px;padding:10px;border-radius:10px;font-weight:700}
+.vmc.up{background:var(--green-soft);color:var(--green)}
+.vmc.down{background:var(--red-soft);color:var(--red)}
+.verdict{border-width:2px}
+.verdict.g{border-color:var(--green);background:var(--green-soft)}
+.verdict.y{border-color:var(--amber);background:var(--amber-soft)}
+.verdict.r{border-color:var(--red);background:var(--red-soft)}
+.vhead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.light{width:18px;height:18px;border-radius:50%;flex:none}
+.g .light{background:var(--green)} .y .light{background:var(--amber)} .r .light{background:var(--red)}
+.vtitle{font-size:1.3rem;font-weight:800;line-height:1.2}
+.vtext{margin:0}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.num{background:var(--surface);border-radius:10px;padding:8px 10px;border:1px solid var(--line)}
+.num b{display:block;font-size:1.25rem;font-weight:800}
+.num span{color:var(--muted);font-size:.8rem}
+.plus{color:var(--green)} .minus{color:var(--red)}
+.warn{color:var(--amber);font-size:.92rem;margin:8px 0 0;font-weight:600}
+svg{display:block;width:100%;height:auto;max-height:320px}
+.note{color:var(--muted);font-size:.88rem;margin:8px 0 0}
+.opt-best td{font-weight:800}
+ul.plain{margin:0;padding-inline-start:18px}
+ul.plain li{margin-bottom:6px}
+a{color:var(--sea)}
+.install{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--sea-soft);border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:.95rem}
+.install button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:9px 14px;min-height:42px;background:var(--sea);color:#fff;cursor:pointer;flex:none}
+.install .x{background:none;color:var(--muted);padding:6px 10px}
+.reset{display:block;margin:10px auto 0;font:inherit;font-weight:600;color:var(--muted);background:none;border:1.5px solid var(--line);border-radius:10px;padding:10px 18px;min-height:44px;cursor:pointer}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <div class="install" id="installBar" hidden>
+    <span id="installText"></span>
+    <span><button type="button" id="installBtn" hidden>התקנה</button><button type="button" class="x" id="installClose" aria-label="סגירה">✕</button></span>
+  </div>
+  <h1>מנוע ישר או מפרש בזווית?</h1>
+  <p class="sub">כשהיעד נגד הרוח: כמה זמן מרוויחים, וכמה זה עולה אם הרוח משתנה.</p>
+
+  <section>
+    <div class="seg" role="group" aria-label="מצב עבודה">
+      <button type="button" id="mManual" aria-pressed="true">ידני</button>
+      <button type="button" id="mAuto" aria-pressed="false">GPS אוטומטי</button>
+    </div>
+
+    <div class="auto" id="autoPanel" hidden>
+      <div class="live">
+        <div><b id="liveSog">–</b><span>מהירות (SOG), קשר</span></div>
+        <div><b id="liveCog">–</b><span>כיוון (COG)</span></div>
+      </div>
+      <button type="button" class="btn" id="btnStraight">1. אני במנוע ישר ליעד – שמור<small>שומר את הכיוון ליעד ואת המהירות במנוע</small></button>
+      <button type="button" class="btn" id="btnSail">2. סטיתי ושטים עם מפרשים – שמור<small>שומר את המהירות עם מפרשים ואת זווית הסטייה</small></button>
+      <div id="vmcBox"></div>
+      <p class="msg" id="autoMsg">מחכה ל־GPS…</p>
+    </div>
+
+    <div class="grid">
+      <div><label for="awa">זווית רוח (AWA)<span class="hint">במכשיר, בנסיעה ישר ליעד</span></label><input id="awa" type="number" inputmode="decimal" min="0" max="180" step="1"></div>
+      <div><label for="side">הרוח מגיעה מ<span class="hint">ביחס לחרטום</span></label><select id="side"><option value="R">ימין</option><option value="L">שמאל</option></select></div>
+      <div><label for="aws">עוצמת רוח (AWS)<span class="hint">קשר, במכשיר</span></label><input id="aws" type="number" inputmode="decimal" min="0" step="0.5" placeholder="מומלץ"></div>
+      <div><label for="dist">מרחק ליעד<span class="hint">מייל ימי, בקו ישר</span></label><input id="dist" type="number" inputmode="decimal" min="0.1" step="0.5"></div>
+      <div><label for="vm">מהירות במנוע ישר<span class="hint">קשר, לפי GPS</span></label><input id="vm" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
+      <div><label for="vs">מהירות עם מפרשים<span class="hint">קשר, מבדיקה או הערכה</span></label><input id="vs" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
+    </div>
+
+    <details class="sub-details">
+      <summary>הגדרות סירה ותרחיש</summary>
+      <div class="grid">
+        <div><label for="pt">זווית לרוח עם מפרשים<span class="hint">מעלות לרוח האמיתית, כולל סחיפה</span></label><input id="pt" type="number" inputmode="decimal" min="20" max="80" step="1"></div>
+        <div><label for="shift">שינוי רוח לתרחיש הגרוע<span class="hint">10° עד שעה, 15° 1–3 שעות, 25° בבריזה מתפתחת</span></label><input id="shift" type="number" inputmode="decimal" min="0" max="60" step="1"></div>
+      </div>
+    </details>
+  </section>
+
+  <section class="verdict" id="verdict" aria-live="polite"></section>
+
+  <section>
+    <details>
+      <summary>פירוט החישוב והמסלול</summary>
+      <p class="legend" id="derived"></p>
+      <div id="chart"></div>
+      <div class="tbl"><table id="opts"></table></div>
+    </details>
+  </section>
+
+  <section>
+    <details>
+      <summary>קווים מנחים</summary>
+      <p class="legend">ה־AWA הוא מה שהמכשיר מראה בנסיעה ישר ליעד במנוע, ברוח של כ־15 קשר. ברוח של 10 או 20 קשר הספים זזים בכ־3°.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>מה רואים</th><th>מה עושים</th><th>סיכון</th></tr></thead>
+          <tbody>
+            <tr><td>AWA עד 8°, ים שטוח</td><td>מנוע ישר. ראשי מתוח לייצוב</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA עד 8°, גלים קצרים</td><td>ראשי, סטייה של 15–20° מהרוח, קטעים קצרים</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA בין 8° ל־32°</td><td>סטייה לצד הרחוק מהרוח, ואז מנוע ישר ליעד</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA מעל 32°</td><td>בדרך כלל אפשר מפרשים ישר ליעד</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>רוח חזקה וים קשה</td><td>ראשי מקוצר, 25–35°, נטייה עד 15°</td><td><span class="risk r-mid">בינוני</span></td></tr>
+            <tr><td>תחזית לשינוי כיוון רוח</td><td>לצאת קודם לצד שאליו הרוח תנטה</td><td><span class="risk r-mid">בינוני</span></td></tr>
+            <tr><td>קטע ארוך שמרחיק מהקו ליעד</td><td>לקצר קטעים ולחזור לקו</td><td><span class="risk r-high">גבוה</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">סיכון = כמה מפסידים מול מנוע ישר אם הרוח משתנה לרעה. נמוך: לא מפסידים. בינוני: עד 10% מזמן ההפלגה. גבוה: יותר.</p>
+    </details>
+  </section>
+
+  <section>
+    <details>
+      <summary>טבלת סף לסטייה</summary>
+      <p class="legend">כשסוטים מהקו ליעד, כל מייל מקרב פחות, ולכן צריך לשוט מהר יותר באותו אחוז כדי לשמור על אותה התקדמות. אם ה־GPS מראה בזווית הזו יותר מהמספר בעמודה האחרונה, הסטייה משתלמת.</p>
+      <div class="tbl"><table id="thr"></table></div>
+    </details>
+  </section>
+
+  <section>
+    <details>
+      <summary>הנחות ובטיחות</summary>
+      <ul class="plain">
+        <li>החישוב מניח מהירות קבועה. זרם צולב וגלים מהחרטום יכולים להפוך את ההמלצה, לכן כדאי לבדוק בשטח במצב GPS.</li>
+        <li>שינוי רוח מחושב ברגע הפנייה. אם הרוח סוגרת כבר בקטע הראשון, ההפסד יכול להיות גדול יותר.</li>
+        <li>בלי עוצמת רוח, המחשבון מניח שהרוח האמיתית שווה ל־AWA. זה שמרני ונוטה להמליץ על מנוע.</li>
+        <li>נטייה עם מנוע דולק: עד כ־15°. מגבלת היצרן היא לרוב 20° ברציפות, בדקו בספר המנוע.</li>
+        <li>בשיוט עם מנוע ומפרשים הסירה היא כלי שיט ממונע לפי החוקים, וביום מציגים חרוט הפוך.</li>
+        <li>לפני שסוטים, בדקו שאין בצד הזה סכנה ניווטית או נתיב שיט.</li>
+        <li>מצב GPS משתמש במיקום של הטלפון. הרוח עדיין מוזנת ידנית.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section>
+    <details>
+      <summary>מקורות</summary>
+      <ul class="plain">
+        <li><a href="https://www.pbo.co.uk/seamanship/motor-sailing-how-to-add-power-to-your-sails-80202" target="_blank" rel="noopener">Practical Boat Owner – Motor sailing: how to add power to your sails</a>. מבחן שטח: מנוע ישר מול מנוע ומפרשים מול מפרשים בלבד.</li>
+        <li><a href="https://sailmagazine.com/cruising/the-art-of-motorsailing/" target="_blank" rel="noopener">SAIL – The Art of Motorsailing</a>. זוויות, נטייה ודלק בשיוט עם מנוע.</li>
+        <li><a href="http://www.oceansail.co.uk/articles/vmgarticle.html" target="_blank" rel="noopener">Ocean Sail – Velocity Made Good</a>. טבלת המחיר של כל זווית סטייה.</li>
+        <li><a href="https://orc.org/uploads/files/ORCsy/2024/ORC-VPP-Documentation-2024.pdf" target="_blank" rel="noopener">ORC VPP Documentation 2024</a>. מודל ביצועים: התנגדות גלים לפי זווית.</li>
+        <li><a href="http://www.sailtrain.co.uk/navigation/leeway.htm" target="_blank" rel="noopener">Sailtrain – Leeway</a>. סחיפה צידית טיפוסית.</li>
+        <li><a href="https://www.speedandsmarts.com/toolbox/articles2/the-smart-course/upwind-strategy" target="_blank" rel="noopener">Speed &amp; Smarts – Upwind Strategy</a>. שינויי רוח וניהול סיכון.</li>
+        <li><a href="https://en.wikipedia.org/wiki/Velocity_made_good" target="_blank" rel="noopener">Wikipedia – Velocity made good</a>. ההגדרה והנוסחה.</li>
+      </ul>
+    </details>
+  </section>
+
+  <button id="reset" type="button" class="reset">איפוס לברירת מחדל</button>
+</main>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var R = Math.PI/180;
+  var ids = ["awa","side","aws","vm","vs","pt","dist","shift"];
+  var defaults = {awa:"25",side:"R",aws:"16",vm:"5",vs:"6",pt:"40",dist:"10",shift:"15"};
+  var vsTouched = false, mode = "manual", bearing = null, lastBeta = null;
+  var KEY = "upwind-calc-v2";
+
+  function load(){
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e){ saved = null; }
+    ids.forEach(function(k){ $(k).value = (saved && saved[k] !== undefined) ? saved[k] : defaults[k]; });
+    vsTouched = !!(saved && saved.vsTouched);
+  }
+  function save(){
+    var o = {vsTouched:vsTouched};
+    ids.forEach(function(k){ o[k] = $(k).value; });
+    try { localStorage.setItem(KEY, JSON.stringify(o)); } catch(e){}
+  }
+
+  function num(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; }
+  function fmtT(h){ var m = Math.round(h*60); var hh = Math.floor(m/60), mm = m%60; return hh + ":" + (mm<10?"0":"") + mm; }
+  function fmtD(h){ var m = Math.round(Math.abs(h)*60); if (m < 60) return m + " דק'"; var hh = Math.floor(m/60), mm = m%60; return hh + ":" + (mm<10?"0":"") + mm + " ש'"; }
+  function f1(x){ return (Math.round(x*10)/10).toFixed(1); }
+  function relAngle(w, t){ var d = ((w - t) % 360 + 540) % 360 - 180; return Math.abs(d); }
+
+  // Best way to cover distance d with true wind at beta deg off the line to target.
+  function solve(d, beta, P, Vm, Vs){
+    var out = {motor:{type:"motor", time:d/Vm, dist:d}};
+    if (beta >= P){
+      out.direct = {type:"direct", time:d/Vs, dist:d, x:d, a:0};
+    } else {
+      var a = P - beta, b = P + beta, s = Math.sin((a+b)*R);
+      var L1 = d*Math.sin(b*R)/s, L2 = d*Math.sin(a*R)/s;
+      out.two = {type:"two", time:(L1+L2)/Vs, dist:L1+L2, x:L1, L2:L2, a:a, b:b};
+      // sail, then motor straight: start the engine when the target is phi* off the bow
+      if (Vs*Math.cos(a*R) > Vm){
+        var phi = Math.acos(Vm/Vs)/R;
+        var x = d*Math.sin((phi-a)*R)/Math.sin(phi*R);
+        if (x > 0 && x < L1*0.999){
+          var rem = Math.hypot(d - x*Math.cos(a*R), x*Math.sin(a*R));
+          out.legmotor = {type:"legmotor", time:x/Vs + rem/Vm, dist:x+rem, x:x, rem:rem, a:a, phi:phi};
+        }
+      }
+    }
+    var all = [out.motor, out.direct, out.two, out.legmotor].filter(Boolean);
+    out.best = all.reduce(function(m,o){ return o.time < m.time ? o : m; });
+    return out;
+  }
+
+  function worstCase(plan, d, beta, P, Vm, Vs, S){
+    var x = plan.type === "direct" ? d/2 : plan.x;
+    var a = plan.a || 0;
+    var px = x*Math.cos(a*R), py = -x*Math.sin(a*R);
+    var rx = d - px, ry = -py, dr = Math.hypot(rx, ry);
+    var th = Math.atan2(ry, rx)/R;
+    var t1 = x/Vs, worst = 0;
+    [beta + S, beta - S].forEach(function(w){
+      var rem = dr < 1e-6 ? 0 : solve(dr, relAngle(w, th), P, Vm, Vs).best.time;
+      worst = Math.max(worst, t1 + rem);
+    });
+    return {time:Math.max(worst, plan.time)};
+  }
+
+  var names = {motor:"מנוע ישר", two:"שני קטעים במפרשים", legmotor:"קטע במפרשים ואז מנוע", direct:"מפרשים ישר ליעד"};
+
+  function calc(){
+    var awa = num("awa"), aws = num("aws"), vm = num("vm"), vs = num("vs"), P = num("pt"), d = num("dist"), S = num("shift");
+    var windRight = $("side").value === "R";
+    var turn = windRight ? "שמאלה" : "ימינה";
+    if (!(awa>=0 && awa<=180) || !(vm>0) || !(vs>0) || !(P>=20 && P<=80) || !(d>0) || !(S>=0)){
+      $("verdict").className = "verdict r";
+      $("verdict").innerHTML = '<p class="vtext">חסר נתון או שהוא מחוץ לטווח. בדקו: זווית רוח 0–180, מהירויות מעל 0, זווית לרוח עם מפרשים 20–80.</p>';
+      $("chart").innerHTML = ""; $("opts").innerHTML = ""; $("derived").innerHTML = ""; $("thr").innerHTML = "";
+      lastBeta = null; return;
+    }
+
+    var beta, tws = null;
+    if (aws > 0){
+      var fx = aws*Math.cos(awa*R) - vm, fy = aws*Math.sin(awa*R);
+      beta = Math.atan2(fy, fx)/R; tws = Math.hypot(fx, fy);
+    } else beta = awa;
+    lastBeta = beta;
+
+    var awaTarget = tws ? Math.round(Math.atan2(tws*Math.sin(P*R), tws*Math.cos(P*R) + vs)/R) : null;
+    $("derived").innerHTML = "רוח אמיתית: " + Math.round(beta) + "° מהקו ליעד" + (tws ? ", " + f1(tws) + " קשר." : ". (בלי עוצמת רוח זו הערכה שמרנית.)");
+
+    var res = solve(d, beta, P, vm, vs);
+    var Tm = res.motor.time;
+    var plans = [res.direct, res.two, res.legmotor].filter(Boolean);
+    plans.forEach(function(p){ p.worst = worstCase(p, d, beta, P, vm, vs, S); });
+    var bestPlan = plans.reduce(function(m,p){ return !m || p.time < m.time ? p : m; }, null);
+    var gain = bestPlan ? Tm - bestPlan.time : 0;
+
+    var warns = [];
+    if (tws !== null && tws < 8) warns.push("רוח חלשה (" + f1(tws) + " קשר). ודאו שהמהירות עם מפרשים באמת אפשרית.");
+    if (beta > 90) warns.push("הרוח מגיעה מאחור. המחשבון מיועד למצב שבו היעד נגד הרוח.");
+    if (!tws) warns.push("בלי עוצמת רוח ההמלצה נוטה למנוע. הוסיפו AWS לתוצאה מדויקת.");
+
+    var v = $("verdict"), cls, title, text;
+    if (!bestPlan || gain <= 0){
+      cls = "r"; title = "מנוע ישר ליעד";
+      var need = res.two ? vm*res.two.dist/d : vm;
+      text = "בנתונים האלה הסטייה לא משתלמת. כדי שתשתלם צריך בערך " + f1(need) + " קשר עם מפרשים.";
+    } else {
+      var worstCost = bestPlan.worst.time - Tm;
+      var riskTxt = worstCost <= 0 ? "נמוך" : worstCost <= Tm*0.10 ? "בינוני" : "גבוה";
+      cls = (gain/Tm >= 0.05 && worstCost <= Tm*0.03) ? "g" : "y";
+      if (bestPlan.type === "direct"){
+        title = "מפרשים ישר ליעד";
+        text = "הרוח רחבה מספיק, אין צורך להתחלף.";
+      } else if (bestPlan.type === "two"){
+        title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°";
+        text = "קטע ראשון של " + f1(bestPlan.x) + " מייל, ואז החלפת צד וקטע של " + f1(bestPlan.L2) + " מייל ליעד.";
+      } else {
+        title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°, ואז מנוע ישר";
+        text = "שוטו כ־" + f1(bestPlan.x) + " מייל, עד שהיעד נמצא " + Math.round(bestPlan.phi) + "° מהחרטום. משם מנוע ישר ליעד: " + f1(bestPlan.rem) + " מייל.";
+      }
+      if (awaTarget !== null) text += " במכשיר תראו בערך " + awaTarget + "° AWA.";
+      text += " סיכון: " + riskTxt + ".";
+    }
+    var html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div><p class="vtext">' + text + '</p>';
+    if (bestPlan && gain > 0){
+      var wc = bestPlan.worst.time - Tm;
+      html += '<div class="nums">' +
+        '<div class="num"><b>' + fmtT(Tm) + '</b><span>מנוע ישר</span></div>' +
+        '<div class="num"><b class="plus">' + fmtD(gain) + '</b><span>רווח צפוי</span></div>' +
+        '<div class="num"><b class="' + (wc > 0 ? "minus" : "plus") + '">' + (wc > 0 ? "+" + fmtD(wc) : fmtD(wc)) + '</b><span>' + (wc > 0 ? "הפסד" : "עדיין רווח") + ' אם הרוח משתנה</span></div>' +
+        '</div>';
+    }
+    warns.forEach(function(w){ html += '<p class="warn">' + w + '</p>'; });
+    v.className = "verdict " + cls; v.innerHTML = html;
+
+    var rows = '<thead><tr><th>אפשרות</th><th>זמן הגעה</th><th>מול מנוע ישר</th></tr></thead><tbody>';
+    rows += '<tr' + (!bestPlan || gain<=0 ? ' class="opt-best"' : '') + '><td>' + names.motor + '</td><td>' + fmtT(Tm) + '</td><td>–</td></tr>';
+    plans.forEach(function(p){
+      var diff = Tm - p.time;
+      rows += '<tr' + (p === bestPlan && gain > 0 ? ' class="opt-best"' : '') + '><td>' + names[p.type] + '</td><td>' + fmtT(p.time) + '</td>' +
+        '<td class="' + (diff > 0 ? "plus" : "minus") + '">' + (diff > 0 ? "חוסך " : "מוסיף ") + fmtD(diff) + '</td></tr>';
+    });
+    $("opts").innerHTML = rows + '</tbody>';
+
+    drawChart(d, beta, windRight, (bestPlan && gain > 0) ? bestPlan : null);
+    drawThreshold(vm, (bestPlan && gain > 0 && bestPlan.a) ? bestPlan.a : null);
+    save();
+  }
+
+  function drawThreshold(vm, devAngle){
+    var near = devAngle === null ? null : Math.min(45, Math.max(5, Math.round(devAngle/5)*5));
+    var t = '<thead><tr><th>סטייה מהקו ליעד</th><th>צריך להיות מהיר יותר ב־</th><th>צריך להגיע ל־<span class="hint">קשר, כשבמנוע ישר ' + vm + '</span></th></tr></thead><tbody>';
+    for (var a = 5; a <= 45; a += 5){
+      var f = 1/Math.cos(a*R);
+      t += '<tr' + (a === near ? ' class="opt-best" style="background:var(--sea-soft)"' : '') + '><td>' + a + '°</td><td>' + ((f-1)*100).toFixed(1) + '%</td><td>' + (vm*f).toFixed(1) + '</td></tr>';
+    }
+    $("thr").innerHTML = t + '</tbody>';
+  }
+
+  function drawChart(d, beta, windRight, plan){
+    var pts = [[0,0]];
+    if (plan && plan.type !== "direct"){ var a = plan.a*R; pts.push([plan.x*Math.cos(a), -plan.x*Math.sin(a)]); }
+    pts.push([d,0]);
+    var ys = pts.map(function(p){return p[1];});
+    var minY = Math.min.apply(null, ys.concat([0])), maxY = Math.max.apply(null, ys.concat([0]));
+    var span = Math.max(maxY - minY, d*0.5);
+    var W = 340, H = 290, pad = 36;
+    var k = Math.min((H - 2*pad)/d, (W - 2*pad)/span);
+    var midY = (minY + maxY)/2, sgn = windRight ? 1 : -1;
+    function sx(y){ return W/2 + sgn*(y - midY)*k; }
+    function sy(x){ return H - pad - x*k; }
+    var F = ' font-family="Assistant,Arial" font-size="13"';
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="תרשים מסלול">';
+    s += '<line x1="' + sx(0) + '" y1="' + sy(0) + '" x2="' + sx(0) + '" y2="' + sy(d) + '" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 5"/>';
+    if (plan){
+      var path = pts.map(function(p,i){ return (i?"L":"M") + sx(p[1]).toFixed(1) + " " + sy(p[0]).toFixed(1); }).join(" ");
+      s += '<path d="' + path + '" fill="none" stroke="var(--sea)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>';
+      if (pts.length === 3) s += '<circle cx="' + sx(pts[1][1]) + '" cy="' + sy(pts[1][0]) + '" r="4.5" fill="var(--sea)"/>';
+    }
+    s += '<circle cx="' + sx(0) + '" cy="' + sy(0) + '" r="6" fill="var(--ink)"/>';
+    s += '<text x="' + sx(0) + '" y="' + (sy(0) + 22) + '" text-anchor="middle" fill="var(--muted)"' + F + '>כאן</text>';
+    s += '<circle cx="' + sx(0) + '" cy="' + sy(d) + '" r="7" fill="none" stroke="var(--ink)" stroke-width="2.5"/>';
+    s += '<text x="' + sx(0) + '" y="' + (sy(d) - 13) + '" text-anchor="middle" fill="var(--muted)"' + F + '>יעד</text>';
+    var L = 50, bx = sx(0) + sgn*Math.sin(beta*R)*14, by = sy(d) + 38;
+    var dx = sgn*Math.sin(beta*R), dy = -Math.cos(beta*R), x0 = bx + dx*L, y0 = by + dy*L;
+    s += '<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--sea)"/></marker></defs>';
+    s += '<line x1="' + x0.toFixed(1) + '" y1="' + y0.toFixed(1) + '" x2="' + bx.toFixed(1) + '" y2="' + by.toFixed(1) + '" stroke="var(--sea)" stroke-width="2" marker-end="url(#ah)"/>';
+    s += '<text x="' + (x0 + dx*12).toFixed(1) + '" y="' + (y0 + dy*12 + 4).toFixed(1) + '" text-anchor="middle" fill="var(--sea)"' + F + '>רוח</text>';
+    $("chart").innerHTML = s + '</svg>';
+  }
+
+  // ---------- GPS mode ----------
+  var watchId = null, buf = [], live = {sog:null, cog:null};
+  function hav(a, b){
+    var p1 = a.lat*R, p2 = b.lat*R, dp = (b.lat-a.lat)*R, dl = (b.lon-a.lon)*R;
+    var h = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
+    return 2*3440.065*Math.asin(Math.sqrt(h)); // nautical miles
+  }
+  function brg(a, b){
+    var p1 = a.lat*R, p2 = b.lat*R, dl = (b.lon-a.lon)*R;
+    var y = Math.sin(dl)*Math.cos(p2), x = Math.cos(p1)*Math.sin(p2) - Math.sin(p1)*Math.cos(p2)*Math.cos(dl);
+    return (Math.atan2(y, x)/R + 360) % 360;
+  }
+  function onPos(pos){
+    var now = pos.timestamp || Date.now();
+    buf.push({t:now, lat:pos.coords.latitude, lon:pos.coords.longitude});
+    buf = buf.filter(function(p){ return now - p.t <= 20000; });
+    var first = buf[0], last = buf[buf.length-1], dt = (last.t - first.t)/3600000;
+    if (buf.length >= 3 && dt*3600 >= 6){
+      var dist = hav(first, last);
+      live.sog = dist/dt;
+      live.cog = dist > 0.004 ? brg(first, last) : null;
+    } else if (pos.coords.speed != null){
+      live.sog = pos.coords.speed*1.94384;
+    }
+    $("liveSog").textContent = live.sog != null ? f1(live.sog) : "–";
+    $("liveCog").textContent = live.cog != null ? Math.round(live.cog) + "°" : "–";
+    if (live.sog != null && live.cog != null) $("autoMsg").textContent = bearing === null ? "נסעו ישר ליעד במנוע ולחצו על 1." : "כיוון ליעד שמור: " + Math.round(bearing) + "°.";
+    else $("autoMsg").textContent = "קולט GPS… צריך כמה שניות של תנועה.";
+    showVmc();
+  }
+  function onErr(e){
+    $("autoMsg").textContent = e && e.code === 1
+      ? "אין הרשאת מיקום. אשרו גישה למיקום בדפדפן, או פתחו את הקישור ישירות ב־Chrome או Safari."
+      : "המיקום לא זמין כרגע. נסו שוב בשטח פתוח, או עברו למצב ידני.";
+  }
+  function showVmc(){
+    var box = $("vmcBox");
+    if (bearing === null || live.sog == null || live.cog == null){ box.innerHTML = ""; return; }
+    var dev = relAngle(live.cog, bearing), vmc = live.sog*Math.cos(dev*R), vm = num("vm");
+    var up = vm > 0 && vmc > vm*1.02;
+    box.innerHTML = '<div class="vmc ' + (up ? "up" : "down") + '">מתקרבים ליעד ב־' + f1(Math.max(vmc,0)) + ' קשר (סטייה ' + Math.round(dev) + '°). במנוע ישר: ' + f1(vm) + '. ' + (up ? "משתלם." : "לא משתלם כרגע.") + '</div>';
+  }
+  function setMode(m){
+    mode = m;
+    $("mManual").setAttribute("aria-pressed", m === "manual");
+    $("mAuto").setAttribute("aria-pressed", m === "auto");
+    $("autoPanel").hidden = m !== "auto";
+    if (m === "auto" && !/^https?:$/.test(location.protocol)){
+      $("autoMsg").textContent = "מצב GPS עובד רק כשפותחים מהקישור, לא מקובץ שמור. בקובץ אפשר להשתמש במצב ידני.";
+      return;
+    }
+    if (m === "auto" && watchId === null){
+      if (!("geolocation" in navigator)){ $("autoMsg").textContent = "הדפדפן הזה לא תומך במיקום. השתמשו במצב ידני."; return; }
+      $("autoMsg").textContent = "מבקש מיקום…";
+      var gotAny = false;
+      try { watchId = navigator.geolocation.watchPosition(function(p){ gotAny = true; onPos(p); }, onErr, {enableHighAccuracy:true, maximumAge:0, timeout:20000}); }
+      catch(e){ onErr(e); }
+      setTimeout(function(){
+        if (!gotAny && mode === "auto") $("autoMsg").textContent = "לא התקבל מיקום. כנראה החלון שבו המחשבון פתוח חוסם גישה למיקום. פתחו את הקישור ישירות בדפדפן (Chrome או Safari) ואשרו מיקום.";
+      }, 8000);
+    }
+    if (m === "manual" && watchId !== null){ navigator.geolocation.clearWatch(watchId); watchId = null; buf = []; }
+  }
+  $("mManual").addEventListener("click", function(){ setMode("manual"); });
+  $("mAuto").addEventListener("click", function(){ setMode("auto"); });
+  $("btnStraight").addEventListener("click", function(){
+    if (live.sog == null || live.cog == null){ $("autoMsg").textContent = "עדיין אין מהירות וכיוון יציבים. המשיכו לנסוע כמה שניות."; return; }
+    bearing = live.cog;
+    $("vm").value = f1(live.sog);
+    if (!vsTouched) $("vs").value = f1(live.sog + 1);
+    $("autoMsg").textContent = "נשמר: כיוון ליעד " + Math.round(bearing) + "°, מנוע ישר " + f1(live.sog) + " קשר.";
+    calc(); showVmc();
+  });
+  $("btnSail").addEventListener("click", function(){
+    if (bearing === null){ $("autoMsg").textContent = "קודם לחצו על 1 בזמן נסיעה ישר ליעד."; return; }
+    if (live.sog == null || live.cog == null){ $("autoMsg").textContent = "עדיין אין מהירות וכיוון יציבים."; return; }
+    var dev = relAngle(live.cog, bearing);
+    $("vs").value = f1(live.sog); vsTouched = true;
+    var msg = "נשמר: " + f1(live.sog) + " קשר עם מפרשים, בסטייה של " + Math.round(dev) + "°.";
+    if (lastBeta !== null && dev > 2){
+      var p = Math.round(dev + lastBeta);
+      if (p >= 20 && p <= 80){ $("pt").value = p; msg += " הזווית לרוח עודכנה ל־" + p + "°."; }
+    }
+    $("autoMsg").textContent = msg;
+    calc(); showVmc();
+  });
+
+  $("reset").addEventListener("click", function(){
+    ids.forEach(function(k){ $(k).value = defaults[k]; });
+    vsTouched = false; bearing = null; calc(); showVmc();
+  });
+
+  // ---------- install & offline ----------
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  }
+  var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  var dismissed = false;
+  try { dismissed = localStorage.getItem("upwind-install-dismissed") === "1"; } catch(e){}
+  var deferred = null;
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferred = e;
+    if (standalone || dismissed) return;
+    $("installText").textContent = "אפשר להתקין את המחשבון בטלפון. הוא יעבוד גם בים בלי קליטה.";
+    $("installBtn").hidden = false; $("installBar").hidden = false;
+  });
+  $("installBtn").addEventListener("click", function(){
+    if (!deferred) return;
+    deferred.prompt();
+    deferred.userChoice.finally(function(){ deferred = null; $("installBar").hidden = true; });
+  });
+  $("installClose").addEventListener("click", function(){
+    $("installBar").hidden = true;
+    try { localStorage.setItem("upwind-install-dismissed", "1"); } catch(e){}
+  });
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if (isIOS && !standalone && !dismissed && /^https?:$/.test(location.protocol)){
+    $("installText").textContent = "להתקנה באייפון: כפתור השיתוף ← הוסף למסך הבית. כך המחשבון יעבוד גם בלי קליטה.";
+    $("installBar").hidden = false;
+  }
+
+  load();
+  ids.forEach(function(k){
+    $(k).addEventListener("input", function(){
+      if (k === "vs") vsTouched = true;
+      if (k === "vm" && !vsTouched){ var v = parseFloat($("vm").value); if (isFinite(v)) $("vs").value = f1(v+1); }
+      calc(); showVmc();
+    });
+    $(k).addEventListener("change", calc);
+  });
+  calc();
+})();
+</script>
+</body>
+</html>
