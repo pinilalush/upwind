@@ -119,8 +119,8 @@ a{color:var(--sea)}
     <span id="installText"></span>
     <span><button type="button" id="installBtn" hidden>התקנה</button><button type="button" class="x" id="installClose" aria-label="סגירה">✕</button></span>
   </div>
-  <h1>מנוע ישר או מפרש בזווית?</h1>
-  <p class="sub">כשהיעד נגד הרוח: כמה זמן מרוויחים, וכמה זה עולה אם הרוח משתנה.</p>
+  <h1>ישר במנוע, או לסטות עם מפרשים?</h1>
+  <p class="sub">כשהיעד נגד הרוח: מה מגיע מהר יותר, וכמה זה עלול לעלות.</p>
 
   <section>
     <div class="seg" role="group" aria-label="מצב עבודה">
@@ -133,26 +133,26 @@ a{color:var(--sea)}
         <div><b id="liveSog">–</b><span>מהירות (SOG), קשר</span></div>
         <div><b id="liveCog">–</b><span>כיוון (COG)</span></div>
       </div>
-      <button type="button" class="btn" id="btnStraight">1. אני במנוע ישר ליעד – שמור<small>שומר את הכיוון ליעד ואת המהירות במנוע</small></button>
-      <button type="button" class="btn" id="btnSail">2. סטיתי ושטים עם מפרשים – שמור<small>שומר את המהירות עם מפרשים ואת זווית הסטייה</small></button>
+      <button type="button" class="btn" id="btnStraight">1. אני בקורס ישר ליעד, במנוע – שמור<small>שומר את הכיוון ליעד ואת המהירות עכשיו</small></button>
+      <button type="button" class="btn" id="btnSail">2. סטיתי והרמתי מפרשים – שמור<small>שומר את המהירות עם המפרשים</small></button>
       <div id="vmcBox"></div>
       <p class="msg" id="autoMsg">מחכה ל־GPS…</p>
     </div>
 
     <div class="grid">
-      <div><label for="awa">זווית רוח (AWA)<span class="hint">במכשיר, במנוע ישר ליעד</span></label><input id="awa" type="number" inputmode="decimal" min="0" max="180" step="1"></div>
-      <div><label for="side">הרוח מגיעה מ<span class="hint">ביחס לחרטום</span></label><select id="side"><option value="R">ימין</option><option value="L">שמאל</option></select></div>
-      <div><label for="aws" id="awsLabel">עוצמת רוח (TWS)<span class="hint">קשר, במכשיר</span></label><input id="aws" type="number" inputmode="decimal" min="0" step="0.5" placeholder="מומלץ"></div>
+      <div><label for="awa">זווית הרוח (AWA)<span class="hint">מה שהמכשיר מראה עכשיו, בקורס ישר ליעד</span></label><input id="awa" type="number" inputmode="decimal" min="0" max="180" step="1"></div>
+      <div><label for="side">הרוח מגיעה מצד<span class="hint">ביחס לחרטום</span></label><select id="side"><option value="R">ימין</option><option value="L">שמאל</option></select></div>
+      <div><label for="aws" id="awsLabel">עוצמת הרוח (TWS)<span class="hint">קשר, מהמכשיר</span></label><input id="aws" type="number" inputmode="decimal" min="0" step="0.5" placeholder="מומלץ"></div>
       <div><label for="dist">מרחק ליעד<span class="hint">מייל ימי, בקו ישר</span></label><input id="dist" type="number" inputmode="decimal" min="0.1" step="0.5"></div>
-      <div><label for="vm">מהירות במנוע ישר<span class="hint">קשר, לפי GPS</span></label><input id="vm" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
-      <div><label for="vs">מהירות עם מפרשים<span class="hint">קשר, מבדיקה או הערכה</span></label><input id="vs" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
+      <div><label for="vm">מהירות ישר ליעד<span class="hint">קשר, מנוע בלבד, לפי GPS</span></label><input id="vm" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
+      <div><label for="vs">מהירות אחרי סטייה<span class="hint">קשר, מנוע ומפרשים, מבדיקה או הערכה</span></label><input id="vs" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
     </div>
 
     <details class="sub-details">
       <summary>הגדרות סירה ומכשיר</summary>
       <div class="grid">
-        <div><label for="pt">זווית צמודה מינימלית<span class="hint">מה שהמכשיר (AWA) מראה בשיוט צמוד</span></label><input id="pt" type="number" inputmode="decimal" min="15" max="80" step="1"></div>
-        <div><label for="wst">עוצמת הרוח שאני מזין<span class="hint">לפי מה שמוצג במכשיר</span></label><select id="wst"><option value="T">TWS – רוח אמיתית</option><option value="A">AWS – רוח נראית</option></select></div>
+        <div><label for="pt">הזווית הכי צמודה לרוח<span class="hint">שבה המפרשים עוד עובדים, לפי המכשיר (AWA)</span></label><input id="pt" type="number" inputmode="decimal" min="15" max="80" step="1"></div>
+        <div><label for="wst">המכשיר מציג עוצמת רוח<span class="hint">בדקו מה כתוב במכשיר</span></label><select id="wst"><option value="T">אמיתית (TWS)</option><option value="A">נראית (AWS)</option></select></div>
       </div>
     </details>
   </section>
@@ -161,7 +161,7 @@ a{color:var(--sea)}
 
   <section>
     <details>
-      <summary>פירוט החישוב והמסלול</summary>
+      <summary>פירוט ושרטוט המסלול</summary>
       <p class="legend" id="derived"></p>
       <div id="chart"></div>
       <div class="tbl"><table id="opts"></table></div>
@@ -171,29 +171,29 @@ a{color:var(--sea)}
   <section>
     <details>
       <summary>קווים מנחים</summary>
-      <p class="legend">ה־AWA הוא מה שהמכשיר מראה בנסיעה ישר ליעד במנוע, ברוח של כ־15 קשר. ברוח של 10 או 20 קשר הספים זזים בכ־3°.</p>
+      <p class="legend">AWA = מה שהמכשיר מראה כשנוסעים ישר ליעד במנוע. הערכים מתאימים לרוח של כ־15 קשר.</p>
       <div class="tbl">
         <table>
           <thead><tr><th>מה רואים</th><th>מה עושים</th><th>סיכון</th></tr></thead>
           <tbody>
-            <tr><td>AWA עד 8°, ים שטוח</td><td>מנוע ישר. ראשי מתוח לייצוב</td><td><span class="risk r-low">נמוך</span></td></tr>
-            <tr><td>AWA עד 8°, גלים קצרים</td><td>ראשי, סטייה של 15–20° מהרוח, קטעים קצרים</td><td><span class="risk r-low">נמוך</span></td></tr>
-            <tr><td>AWA בין 8° ל־32°</td><td>סטייה לצד הרחוק מהרוח, ואז מנוע ישר ליעד</td><td><span class="risk r-low">נמוך</span></td></tr>
-            <tr><td>AWA מעל 32°</td><td>בדרך כלל אפשר מפרשים ישר ליעד</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA עד 8°, ים שטוח</td><td>ישר ליעד במנוע. ראשי מתוח לייצוב</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA עד 8°, גלים קצרים</td><td>להרים ראשי ולסטות 15–20°, בקטעים קצרים</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA בין 8° ל־32°</td><td>לסטות עם מפרשים לצד הרחוק מהרוח, ואז ישר ליעד</td><td><span class="risk r-low">נמוך</span></td></tr>
+            <tr><td>AWA מעל 32°</td><td>בדרך כלל אפשר ישר ליעד עם מפרשים</td><td><span class="risk r-low">נמוך</span></td></tr>
             <tr><td>רוח חזקה וים קשה</td><td>ראשי מקוצר, 25–35°, נטייה עד 15°</td><td><span class="risk r-mid">בינוני</span></td></tr>
             <tr><td>תחזית לשינוי כיוון רוח</td><td>לצאת קודם לצד שאליו הרוח תנטה</td><td><span class="risk r-mid">בינוני</span></td></tr>
             <tr><td>קטע ארוך שמרחיק מהקו ליעד</td><td>לקצר קטעים ולחזור לקו</td><td><span class="risk r-high">גבוה</span></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note">סיכון = כמה מפסידים מול מנוע ישר אם המפרשים לא מוסיפים מהירות (למשל הרוח נחלשת או משנה כיוון). נמוך: עד 5% מזמן ההפלגה. בינוני: עד 10%. גבוה: יותר.</p>
+      <p class="note">סיכון = כמה תאחרו לעומת ישר במנוע, אם המפרשים לא יוסיפו מהירות (למשל הרוח נחלשת או משנה כיוון). נמוך: עד 5% מזמן ההפלגה. בינוני: עד 10%. גבוה: יותר.</p>
     </details>
   </section>
 
   <section>
     <details>
       <summary>כמה לסטות וכמה זמן להמשיך</summary>
-      <p class="legend">כשסוטים, צריך לשוט מהר יותר כדי לא להפסיד. אבל הסף נכון לרגע זה בלבד: ככל שממשיכים באותו כיוון, היעד זז הצידה והסף עולה. לכן העמודה האחרונה אומרת כמה מייל להמשיך במפרשים, ומשם לפנות ישר ליעד במנוע.</p>
+      <p class="legend">כשסוטים מהיעד הדרך מתארכת, ולכן צריך לשוט מהר יותר. העמודה האמצעית: איזו מהירות צריך כדי לא לאחר. העמודה האחרונה: עם המהירות שהזנתם, כמה מייל לסטות לפני שפונים ישר ליעד.</p>
       <div class="tbl"><table id="thr"></table></div>
       <p class="warn" id="thrWarn" hidden></p>
     </details>
@@ -203,10 +203,10 @@ a{color:var(--sea)}
     <details>
       <summary>הנחות ובטיחות</summary>
       <ul class="plain">
-        <li>החישוב מניח מהירות קבועה. זרם צולב וגלים מהחרטום יכולים להפוך את ההמלצה, לכן כדאי לבדוק בשטח במצב GPS.</li>
+        <li>החישוב מניח מהירות קבועה. זרם וגלים יכולים לשנות את התוצאה, לכן כדאי לבדוק בים במצב GPS.</li>
         <li>המנוע דולק כל הזמן. התרחיש הגרוע: המפרשים לא מוסיפים מהירות, ונשארים עם מהירות המנוע על דרך ארוכה יותר.</li>
         <li>סטייה משנה את הזווית שהמכשיר מראה פחות מגודל הסטייה, כי חלק מהרוח במכשיר נוצר מהנסיעה. המחשבון מחשב את זה לבד.</li>
-        <li>בלי עוצמת רוח, המחשבון מניח שהרוח האמיתית שווה ל־AWA. זה שמרני ונוטה להמליץ על מנוע.</li>
+        <li>בלי עוצמת רוח החישוב פחות מדויק ונוטה להמליץ על מנוע.</li>
         <li>נטייה עם מנוע דולק: עד כ־15°. מגבלת היצרן היא לרוב 20° ברציפות, בדקו בספר המנוע.</li>
         <li>בשיוט עם מנוע ומפרשים הסירה היא כלי שיט ממונע לפי החוקים, וביום מציגים חרוט הפוך.</li>
         <li>לפני שסוטים, בדקו שאין בצד הזה סכנה ניווטית או נתיב שיט.</li>
@@ -298,17 +298,17 @@ a{color:var(--sea)}
     return {time:plan.dist/Vm};
   }
 
-  var names = {motor:"מנוע ישר", two:"זיגזג עם מפרשים", legmotor:"סטייה עם מפרשים ואז ישר", direct:"ישר ליעד עם מפרשים"};
+  var names = {motor:"ישר ליעד במנוע", two:"זיגזג עם מפרשים", legmotor:"לסטות עם מפרשים, ואז ישר", direct:"ישר ליעד עם מפרשים"};
 
   function calc(){
     var awa = num("awa"), aws = num("aws"), vm = num("vm"), vs = num("vs"), Pa = num("pt"), d = num("dist");
     var isTWS = $("wst").value === "T";
-    $("awsLabel").firstChild.nodeValue = isTWS ? "עוצמת רוח (TWS)" : "עוצמת רוח (AWS)";
+    $("awsLabel").firstChild.nodeValue = isTWS ? "עוצמת הרוח (TWS)" : "עוצמת הרוח (AWS)";
     var windRight = $("side").value === "R";
     var turn = windRight ? "שמאלה" : "ימינה";
     if (!(awa>=0 && awa<=180) || !(vm>0) || !(vs>0) || !(Pa>=15 && Pa<=80) || !(d>0)){
       $("verdict").className = "verdict r";
-      $("verdict").innerHTML = '<p class="vtext">חסר נתון או שהוא מחוץ לטווח. בדקו: זווית רוח 0–180, מהירויות מעל 0, זווית צמודה 15–80.</p>';
+      $("verdict").innerHTML = '<p class="vtext">חסר נתון או שהוא לא הגיוני. בדקו: זווית רוח בין 0 ל־180, מהירויות מעל 0, והזווית הכי צמודה בין 15 ל־80.</p>';
       $("chart").innerHTML = ""; $("opts").innerHTML = ""; $("derived").innerHTML = ""; $("thr").innerHTML = "";
       lastBeta = null; return;
     }
@@ -335,17 +335,17 @@ a{color:var(--sea)}
 
     if (inconsistent){
       $("verdict").className = "verdict r";
-      $("verdict").innerHTML = '<p class="vtext">הנתונים לא מסתדרים: במהירות ' + f1(vm) + ' קשר ורוח אמיתית של ' + f1(tws) + ' קשר, המכשיר לא יכול להראות ' + Math.round(awa) + '°. בדקו אם המכשיר מציג TWS או AWS (בהגדרות סירה ותרחיש).</p>';
+      $("verdict").innerHTML = '<p class="vtext">הנתונים לא מסתדרים: במהירות ' + f1(vm) + ' קשר ורוח אמיתית של ' + f1(tws) + ' קשר, המכשיר לא יכול להראות ' + Math.round(awa) + '°. בדקו ב"הגדרות סירה ומכשיר" אם המכשיר מציג רוח אמיתית (TWS) או נראית (AWS).</p>';
       $("chart").innerHTML = ""; $("opts").innerHTML = ""; $("derived").innerHTML = ""; $("thr").innerHTML = "";
       return;
     }
 
-    $("derived").innerHTML = "רוח אמיתית: " + Math.round(beta) + "° מהקו ליעד" + (tws ? ", " + f1(tws) + " קשר." : ". (בלי עוצמת רוח זו הערכה שמרנית.)") +
-      (tws && !noSail ? " שיוט צמוד ב־" + Math.round(Pa) + "° במכשיר = " + Math.round(P) + "° לרוח האמיתית." : "");
+    $("derived").innerHTML = (tws ? "רוח אמיתית: " + f1(tws) + " קשר, " : "רוח אמיתית (הערכה): ") + Math.round(beta) + "° מהקו ליעד." +
+      (tws && !noSail ? " בזווית הכי צמודה (" + Math.round(Pa) + "° במכשיר) הסירה תהיה " + Math.round(P) + "° מהרוח האמיתית." : "");
 
     if (noSail){
       $("verdict").className = "verdict r";
-      $("verdict").innerHTML = '<div class="vhead"><span class="light"></span><span class="vtitle">מנוע ישר ליעד</span></div><p class="vtext">ברוח של ' + f1(tws) + ' קשר הסירה לא תגיע ל־' + Math.round(Pa) + '° במכשיר במהירות ' + f1(vs) + ' קשר. רוב הרוח במכשיר תיווצר מהמהירות שלכם. מנוע ישר, עם ראשי לייצוב.</p>';
+      $("verdict").innerHTML = '<div class="vhead"><span class="light"></span><span class="vtitle">להמשיך ישר ליעד במנוע</span></div><p class="vtext">הרוח חלשה מדי (' + f1(tws) + ' קשר). גם אם תסטו, המפרשים לא יעבדו ב־' + Math.round(Pa) + '° במהירות ' + f1(vs) + ' קשר. מומלץ ראשי מתוח לייצוב.</p>';
       $("chart").innerHTML = ""; $("opts").innerHTML = "";
       drawThreshold(vm, vs, d, null); save(); return;
     }
@@ -358,50 +358,57 @@ a{color:var(--sea)}
     var gain = bestPlan ? Tm - bestPlan.time : 0;
 
     var warns = [];
-    if (tws !== null && tws < 8) warns.push("רוח חלשה (" + f1(tws) + " קשר). ודאו שהמהירות עם מפרשים באמת אפשרית.");
+    if (tws !== null && tws < 8) warns.push("רוח חלשה (" + f1(tws) + " קשר). ודאו שהמהירות אחרי סטייה שהזנתם באמת אפשרית.");
     if (beta > 90) warns.push("הרוח מגיעה מאחור. המחשבון מיועד למצב שבו היעד נגד הרוח.");
-    if (!tws) warns.push("בלי עוצמת רוח ההמלצה נוטה למנוע. הוסיפו AWS לתוצאה מדויקת.");
+    if (!tws) warns.push("לא הוזנה עוצמת רוח, ולכן החישוב פחות מדויק ונוטה להמליץ על מנוע.");
 
-    var v = $("verdict"), cls, title, text;
+    var v = $("verdict"), cls, title, text, html;
+    var negligible = bestPlan && gain > 0 && gain*60 < 2;
+    function steps(p){
+      if (p.type === "direct") return "להמשיך ישר ליעד ולהוסיף מפרשים. הרוח מספיק מהצד, אין צורך לסטות.";
+      if (p.type === "two") return "1. לסטות " + Math.round(p.a) + "° " + turn + " ולהפליג עם מנוע ומפרשים " + f1(p.x) + " מייל.<br>2. להחליף צד ולהמשיך עם מנוע ומפרשים " + f1(p.L2) + " מייל עד היעד.";
+      return "1. לסטות " + Math.round(p.a) + "° " + turn + " ולהפליג עם מנוע ומפרשים " + f1(p.x) + " מייל (עד שהיעד נמצא " + Math.round(p.phi) + "° מהחרטום).<br>2. לפנות ישר ליעד ולהמשיך במנוע " + f1(p.rem) + " מייל.";
+    }
+    function planTitle(p){
+      if (p.type === "direct") return "ישר ליעד, עם מפרשים";
+      if (p.type === "two") return "זיגזג עם מפרשים, קודם " + Math.round(p.a) + "° " + turn;
+      return "לסטות " + Math.round(p.a) + "° " + turn + " עם מפרשים, ואחר כך ישר ליעד";
+    }
+    var bonus = '<p class="vtext sum">בנוסף: עם מפרשים הסירה יציבה יותר, מתגלגלת פחות וחובטת פחות בגלים.</p>';
+
     if (!bestPlan || gain <= 0){
-      cls = "r"; title = "מנוע ישר ליעד";
+      cls = "r"; title = "להמשיך ישר ליעד במנוע";
       var aNeed = P - beta;
       if (aNeed > 0 && aNeed < 85){
-        text = "כדי להגיע ל־" + Math.round(Pa) + "° במכשיר צריך לסטות " + Math.round(aNeed) + "° מהיעד. בסטייה כזו צריך יותר מ־" + f1(vm/Math.cos(aNeed*R)) + " קשר עם מפרשים כדי שישתלם.";
-      } else text = "בנתונים האלה הסטייה לא משתלמת.";
-      text += " גם במנוע ישר כדאי ראשי מתוח לייצוב.";
+        text = "לסטות לא משתלם כאן. כדי שהמפרשים יעבדו צריך לסטות " + Math.round(aNeed) + "°, ובזווית כזו צריך לשוט לפחות " + f1(vm/Math.cos(aNeed*R)) + " קשר כדי להגיע מהר יותר (הזנתם " + f1(vs) + ").";
+      } else text = "לסטות לא משתלם כאן.";
+      text += " מומלץ ראשי מתוח לייצוב.";
+      html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div><p class="vtext">' + text + '</p>';
+    } else if (negligible){
+      cls = "y"; title = "כמעט אותו זמן";
+      html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div>' +
+        '<p class="vtext">לסטות עם מפרשים או להמשיך ישר במנוע: ההבדל פחות מ־2 דקות. אם הגלים מציקים, אפשר לסטות בשביל הנוחות:</p>' +
+        '<p class="vtext sum">' + steps(bestPlan) + '</p>' + bonus;
     } else {
-      var worstCost = bestPlan.worst.time - Tm;
-      var riskTxt = worstCost <= Tm*0.05 ? "נמוך" : worstCost <= Tm*0.10 ? "בינוני" : "גבוה";
-      cls = worstCost <= Tm*0.10 ? "g" : "y";
-      if (bestPlan.type === "direct"){
-        title = "ישר ליעד עם מפרשים";
-        text = "הרוח רחבה מספיק, אין צורך לסטות.";
-      } else if (bestPlan.type === "two"){
-        title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°";
-        text = "קטע ראשון של " + f1(bestPlan.x) + " מייל, ואז החלפת צד וקטע של " + f1(bestPlan.L2) + " מייל ליעד, הכול עם מנוע ומפרשים.";
-      } else {
-        title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°, ואז מנוע ישר";
-        text = "שוטו כ־" + f1(bestPlan.x) + " מייל, עד שהיעד נמצא " + Math.round(bestPlan.phi) + "° מהחרטום. משם מנוע ישר ליעד: " + f1(bestPlan.rem) + " מייל.";
-      }
-      text += " סיכון: " + riskTxt + ".";
-    }
-    var html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div><p class="vtext">' + text + '</p>';
-    if (bestPlan && gain > 0){
       var wc = bestPlan.worst.time - Tm;
-      html += '<div class="trip"><table><thead><tr><th></th><th>דרך (מייל)<span class="hint">לפני הפנייה ואחריה</span></th><th>משך</th></tr></thead><tbody>' +
-        '<tr><td>מנוע ישר</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td></tr>' +
-        '<tr><td><b>עם הסטייה</b></td><td><b>' + legsTxt(bestPlan, d) + '</b></td><td><b>' + fmtT(bestPlan.time) + '</b></td></tr>' +
+      var riskTxt = wc <= Tm*0.05 ? "נמוך" : wc <= Tm*0.10 ? "בינוני" : "גבוה";
+      cls = wc <= Tm*0.10 ? "g" : "y";
+      title = planTitle(bestPlan);
+      html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div>' +
+        '<p class="vtext">' + steps(bestPlan) + '</p>' +
+        '<div class="trip"><table><thead><tr><th></th><th>מרחק (מייל)' + (bestPlan.type === "direct" ? '' : '<span class="hint">שלב 1 ואז שלב 2</span>') + '</th><th>זמן</th></tr></thead><tbody>' +
+        '<tr><td>ישר ליעד במנוע</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td></tr>' +
+        '<tr><td><b>' + (bestPlan.type === "direct" ? 'ישר עם מפרשים' : 'עם הסטייה') + '</b></td><td><b>' + legsTxt(bestPlan, d) + '</b></td><td><b>' + fmtT(bestPlan.time) + '</b></td></tr>' +
         '</tbody></table></div>' +
-        '<p class="vtext sum"><b class="plus">חוסך ' + fmtD(gain) + '.</b> ' +
-        (wc > 0 ? 'אם המפרשים לא עוזרים: <b class="minus">מוסיף ' + fmtD(wc) + '</b>.' : 'גם אם המפרשים לא עוזרים, לא מפסידים.') + '</p>' +
-        (cls === "y" ? '<p class="vtext sum">צהוב: הסטייה ארוכה, ואם המפרשים לא מוסיפים מהירות ההפסד גדול. בדקו ב־GPS כבר בתחילת הסטייה שהמהירות באמת עולה.</p>' : '') +
-        '<p class="vtext sum">בונוס: עם מפרשים הסירה יציבה יותר, מתגלגלת פחות וחובטת פחות בגלים.</p>';
+        '<p class="vtext sum"><b class="plus">חיסכון: ' + fmtD(gain) + '.</b> ' +
+        (wc > 0 ? 'אם המפרשים לא יוסיפו מהירות: <b class="minus">איחור של ' + fmtD(wc) + '</b>.' : 'גם אם המפרשים לא יוסיפו מהירות, לא תאחרו.') + ' סיכון: ' + riskTxt + '.</p>' +
+        (cls === "y" ? '<p class="vtext sum">שימו לב: אם המפרשים לא יוסיפו מהירות, האיחור גדול. בדקו ב־GPS כבר בתחילת הסטייה שהמהירות באמת עולה.</p>' : '') +
+        bonus;
     }
     warns.forEach(function(w){ html += '<p class="warn">' + w + '</p>'; });
     v.className = "verdict " + cls; v.innerHTML = html;
 
-    var rows = '<thead><tr><th>אפשרות</th><th>דרך (מייל)</th><th>משך</th><th>מול מנוע ישר</th></tr></thead><tbody>';
+    var rows = '<thead><tr><th>אפשרות</th><th>מרחק (מייל)</th><th>זמן</th><th>לעומת ישר במנוע</th></tr></thead><tbody>';
     rows += '<tr' + (!bestPlan || gain<=0 ? ' class="opt-best"' : '') + '><td>' + names.motor + '</td><td>' + f1(d) + '</td><td>' + fmtT(Tm) + '</td><td>–</td></tr>';
     var shown = 0;
     plans.forEach(function(p){
@@ -409,12 +416,12 @@ a{color:var(--sea)}
       if (diff <= 0) return;
       shown++;
       rows += '<tr' + (p === bestPlan && gain > 0 ? ' class="opt-best"' : '') + '><td>' + names[p.type] + '</td><td>' + legsTxt(p, d) + '</td><td>' + fmtT(p.time) + '</td>' +
-        '<td class="' + (diff > 0 ? "plus" : "minus") + '">' + (diff > 0 ? "חוסך " : "מוסיף ") + fmtD(diff) + '</td></tr>';
+        '<td class="' + (diff > 0 ? "plus" : "minus") + '">' + (diff > 0 ? "חוסך " : "מאחר ") + fmtD(diff) + '</td></tr>';
     });
-    if (!shown) rows += '<tr><td colspan="4">אין אפשרות עם מפרשים שחוסכת זמן בנתונים האלה.</td></tr>';
+    if (!shown) rows += '<tr><td colspan="4">בנתונים האלה אין אפשרות עם מפרשים שמגיעה מהר יותר.</td></tr>';
     $("opts").innerHTML = rows + '</tbody>';
 
-    drawChart(d, beta, windRight, (bestPlan && gain > 0) ? bestPlan : null);
+    drawChart(d, beta, windRight, (bestPlan && gain > 0 && !negligible) ? bestPlan : null);
     drawThreshold(vm, vs, d, (bestPlan && gain > 0 && bestPlan.a) ? bestPlan.a : null);
     save();
   }
@@ -423,20 +430,20 @@ a{color:var(--sea)}
     var near = devAngle === null ? null : Math.min(45, Math.max(5, Math.round(devAngle/5)*5));
     var Tm = d/vm;
     var phi = vs > vm ? Math.acos(vm/vs)/R : 0;
-    var t = '<thead><tr><th>סטייה מהיעד</th><th>מהירות נדרשת<span class="hint">קשר, מול מנוע של ' + f1(vm) + '</span></th><th>עם ' + f1(vs) + ' קשר במפרשים<span class="hint">כמה להמשיך, ואז ישר ליעד</span></th></tr></thead><tbody>';
+    var t = '<thead><tr><th>סטייה מהיעד</th><th>מהירות שצריך<span class="hint">קשר, כדי לא לאחר לעומת ' + f1(vm) + ' ישר</span></th><th>עם ' + f1(vs) + ' קשר<span class="hint">כמה מייל לסטות, ואז ישר</span></th></tr></thead><tbody>';
     for (var a = 5; a <= 45; a += 5){
       var f = 1/Math.cos(a*R), cell;
       if (vs > vm*f && phi > a){
         var x = d*Math.sin((phi-a)*R)/Math.sin(phi*R);
         var rem = Math.hypot(d - x*Math.cos(a*R), x*Math.sin(a*R));
         var save = Tm - (x/vs + rem/vm);
-        cell = 'עד ' + f1(x) + ' מייל' + (save*60 >= 0.5 ? '<span class="hint">חוסך ' + fmtD(save) + '</span>' : '<span class="hint">חיסכון זניח</span>');
+        cell = f1(x) + ' מייל' + (save*60 >= 0.5 ? '<span class="hint">חוסך ' + fmtD(save) + '</span>' : '<span class="hint">חיסכון זניח</span>');
       } else cell = '<span class="minus">לא משתלם</span>';
       t += '<tr' + (a === near ? ' class="opt-best" style="background:var(--sea-soft)"' : '') + '><td>' + a + '°</td><td>' + (vm*f).toFixed(1) + '<span class="hint">+' + ((f-1)*100).toFixed(1) + '%</span></td><td>' + cell + '</td></tr>';
     }
     $("thr").innerHTML = t + '</tbody>';
     var w = $("thrWarn");
-    if (vm < 2){ w.hidden = false; w.textContent = "מהירות המנוע בשדה למעלה נמוכה מ־2 קשר. אם בדקתם GPS ביבשה, הכניסו את המהירות האמיתית של הסירה."; }
+    if (vm < 2){ w.hidden = false; w.textContent = "המהירות ישר ליעד נמוכה מ־2 קשר. אם בדקתם GPS ביבשה, הזינו את המהירות האמיתית של הסירה."; }
     else w.hidden = true;
   }
 
@@ -512,7 +519,7 @@ a{color:var(--sea)}
     if (bearing === null || live.sog == null || live.cog == null){ box.innerHTML = ""; return; }
     var dev = relAngle(live.cog, bearing), vmc = live.sog*Math.cos(dev*R), vm = num("vm");
     var up = vm > 0 && vmc > vm*1.02;
-    box.innerHTML = '<div class="vmc ' + (up ? "up" : "down") + '">מתקרבים ליעד ב־' + f1(Math.max(vmc,0)) + ' קשר (סטייה ' + Math.round(dev) + '°). במנוע ישר: ' + f1(vm) + '. ' + (up ? "משתלם." : "לא משתלם כרגע.") + '</div>';
+    box.innerHTML = '<div class="vmc ' + (up ? "up" : "down") + '">מתקרבים ליעד ב־' + f1(Math.max(vmc,0)) + ' קשר (סטייה ' + Math.round(dev) + '°). ישר במנוע: ' + f1(vm) + ' קשר. ' + (up ? "משתלם." : "לא משתלם כרגע.") + '</div>';
   }
   function setMode(m){
     mode = m;
@@ -542,15 +549,15 @@ a{color:var(--sea)}
     bearing = live.cog;
     $("vm").value = f1(live.sog);
     if (!vsTouched) $("vs").value = f1(live.sog + 1);
-    $("autoMsg").textContent = "נשמר: כיוון ליעד " + Math.round(bearing) + "°, מנוע ישר " + f1(live.sog) + " קשר.";
+    $("autoMsg").textContent = "נשמר: כיוון ליעד " + Math.round(bearing) + "°, מהירות " + f1(live.sog) + " קשר.";
     calc(); showVmc();
   });
   $("btnSail").addEventListener("click", function(){
-    if (bearing === null){ $("autoMsg").textContent = "קודם לחצו על 1 בזמן נסיעה ישר ליעד."; return; }
+    if (bearing === null){ $("autoMsg").textContent = "קודם לחצו על 1, כשאתם בקורס ישר ליעד."; return; }
     if (live.sog == null || live.cog == null){ $("autoMsg").textContent = "עדיין אין מהירות וכיוון יציבים."; return; }
     var dev = relAngle(live.cog, bearing);
     $("vs").value = f1(live.sog); vsTouched = true;
-    var msg = "נשמר: " + f1(live.sog) + " קשר עם מפרשים, בסטייה של " + Math.round(dev) + "°.";
+    var msg = "נשמר: " + f1(live.sog) + " קשר עם מפרשים, בסטייה של " + Math.round(dev) + "° מהיעד.";
 
     $("autoMsg").textContent = msg;
     calc(); showVmc();
@@ -562,7 +569,7 @@ a{color:var(--sea)}
   });
 
   // ---------- version check ----------
-  var APP_VERSION = "2026-10-04.5";
+  var APP_VERSION = "2026-10-04.6";
   $("ver").textContent = "גרסה " + APP_VERSION;
   function checkUpdate(){
     if (!/^https?:$/.test(location.protocol) || !navigator.onLine) return;
