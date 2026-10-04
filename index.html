@@ -183,9 +183,10 @@ a{color:var(--sea)}
 
   <section>
     <details>
-      <summary>טבלת סף לסטייה</summary>
-      <p class="legend">כשסוטים מהקו ליעד, כל מייל מקרב פחות, ולכן צריך לשוט מהר יותר באותו אחוז כדי לשמור על אותה התקדמות. אם ה־GPS מראה בזווית הזו יותר מהמספר בעמודה האחרונה, הסטייה משתלמת.</p>
+      <summary>כמה לסטות וכמה זמן להמשיך</summary>
+      <p class="legend">כשסוטים, צריך לשוט מהר יותר כדי לא להפסיד. אבל הסף נכון לרגע זה בלבד: ככל שממשיכים באותו כיוון, היעד זז הצידה והסף עולה. לכן העמודה האחרונה אומרת כמה מייל להמשיך במפרשים, ומשם לפנות ישר ליעד במנוע.</p>
       <div class="tbl"><table id="thr"></table></div>
+      <p class="warn" id="thrWarn" hidden></p>
     </details>
   </section>
 
@@ -366,18 +367,29 @@ a{color:var(--sea)}
     $("opts").innerHTML = rows + '</tbody>';
 
     drawChart(d, beta, windRight, (bestPlan && gain > 0) ? bestPlan : null);
-    drawThreshold(vm, (bestPlan && gain > 0 && bestPlan.a) ? bestPlan.a : null);
+    drawThreshold(vm, vs, d, (bestPlan && gain > 0 && bestPlan.a) ? bestPlan.a : null);
     save();
   }
 
-  function drawThreshold(vm, devAngle){
+  function drawThreshold(vm, vs, d, devAngle){
     var near = devAngle === null ? null : Math.min(45, Math.max(5, Math.round(devAngle/5)*5));
-    var t = '<thead><tr><th>סטייה מהקו ליעד</th><th>צריך להיות מהיר יותר ב־</th><th>צריך להגיע ל־<span class="hint">קשר, כשבמנוע ישר ' + vm + '</span></th></tr></thead><tbody>';
+    var Tm = d/vm;
+    var phi = vs > vm ? Math.acos(vm/vs)/R : 0;
+    var t = '<thead><tr><th>סטייה מהיעד</th><th>מהירות נדרשת<span class="hint">קשר, מול מנוע של ' + f1(vm) + '</span></th><th>עם ' + f1(vs) + ' קשר במפרשים<span class="hint">כמה להמשיך, ואז ישר ליעד</span></th></tr></thead><tbody>';
     for (var a = 5; a <= 45; a += 5){
-      var f = 1/Math.cos(a*R);
-      t += '<tr' + (a === near ? ' class="opt-best" style="background:var(--sea-soft)"' : '') + '><td>' + a + '°</td><td>' + ((f-1)*100).toFixed(1) + '%</td><td>' + (vm*f).toFixed(1) + '</td></tr>';
+      var f = 1/Math.cos(a*R), cell;
+      if (vs > vm*f && phi > a){
+        var x = d*Math.sin((phi-a)*R)/Math.sin(phi*R);
+        var rem = Math.hypot(d - x*Math.cos(a*R), x*Math.sin(a*R));
+        var save = Tm - (x/vs + rem/vm);
+        cell = 'עד ' + f1(x) + ' מייל' + (save*60 >= 0.5 ? '<span class="hint">חוסך ' + fmtD(save) + '</span>' : '<span class="hint">חיסכון זניח</span>');
+      } else cell = '<span class="minus">לא משתלם</span>';
+      t += '<tr' + (a === near ? ' class="opt-best" style="background:var(--sea-soft)"' : '') + '><td>' + a + '°</td><td>' + (vm*f).toFixed(1) + '<span class="hint">+' + ((f-1)*100).toFixed(1) + '%</span></td><td>' + cell + '</td></tr>';
     }
     $("thr").innerHTML = t + '</tbody>';
+    var w = $("thrWarn");
+    if (vm < 2){ w.hidden = false; w.textContent = "מהירות המנוע בשדה למעלה נמוכה מ־2 קשר. אם בדקתם GPS ביבשה, הכניסו את המהירות האמיתית של הסירה."; }
+    else w.hidden = true;
   }
 
   function drawChart(d, beta, windRight, plan){
