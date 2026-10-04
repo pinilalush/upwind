@@ -140,9 +140,9 @@ a{color:var(--sea)}
     </div>
 
     <div class="grid">
-      <div><label for="awa">זווית רוח (AWA)<span class="hint">במכשיר, בנסיעה ישר ליעד</span></label><input id="awa" type="number" inputmode="decimal" min="0" max="180" step="1"></div>
+      <div><label for="awa">זווית רוח (AWA)<span class="hint">במכשיר, במנוע ישר ליעד</span></label><input id="awa" type="number" inputmode="decimal" min="0" max="180" step="1"></div>
       <div><label for="side">הרוח מגיעה מ<span class="hint">ביחס לחרטום</span></label><select id="side"><option value="R">ימין</option><option value="L">שמאל</option></select></div>
-      <div><label for="aws">עוצמת רוח (AWS)<span class="hint">קשר, במכשיר</span></label><input id="aws" type="number" inputmode="decimal" min="0" step="0.5" placeholder="מומלץ"></div>
+      <div><label for="aws" id="awsLabel">עוצמת רוח (TWS)<span class="hint">קשר, במכשיר</span></label><input id="aws" type="number" inputmode="decimal" min="0" step="0.5" placeholder="מומלץ"></div>
       <div><label for="dist">מרחק ליעד<span class="hint">מייל ימי, בקו ישר</span></label><input id="dist" type="number" inputmode="decimal" min="0.1" step="0.5"></div>
       <div><label for="vm">מהירות במנוע ישר<span class="hint">קשר, לפי GPS</span></label><input id="vm" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
       <div><label for="vs">מהירות עם מפרשים<span class="hint">קשר, מבדיקה או הערכה</span></label><input id="vs" type="number" inputmode="decimal" min="0.5" step="0.1"></div>
@@ -151,7 +151,8 @@ a{color:var(--sea)}
     <details class="sub-details">
       <summary>הגדרות סירה ותרחיש</summary>
       <div class="grid">
-        <div><label for="pt">זווית לרוח עם מפרשים<span class="hint">מעלות לרוח האמיתית, כולל סחיפה</span></label><input id="pt" type="number" inputmode="decimal" min="20" max="80" step="1"></div>
+        <div><label for="pt">זווית צמודה מינימלית<span class="hint">מה שהמכשיר (AWA) מראה בשיוט צמוד</span></label><input id="pt" type="number" inputmode="decimal" min="15" max="80" step="1"></div>
+        <div><label for="wst">עוצמת הרוח שאני מזין<span class="hint">לפי מה שמוצג במכשיר</span></label><select id="wst"><option value="T">TWS – רוח אמיתית</option><option value="A">AWS – רוח נראית</option></select></div>
         <div><label for="shift">שינוי רוח לתרחיש הגרוע<span class="hint">10° עד שעה, 15° 1–3 שעות, 25° בבריזה מתפתחת</span></label><input id="shift" type="number" inputmode="decimal" min="0" max="60" step="1"></div>
       </div>
     </details>
@@ -237,10 +238,10 @@ a{color:var(--sea)}
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var R = Math.PI/180;
-  var ids = ["awa","side","aws","vm","vs","pt","dist","shift"];
-  var defaults = {awa:"25",side:"R",aws:"16",vm:"5",vs:"6",pt:"40",dist:"10",shift:"15"};
+  var ids = ["awa","side","aws","wst","vm","vs","pt","dist","shift"];
+  var defaults = {awa:"25",side:"R",aws:"12",wst:"T",vm:"5",vs:"6",pt:"35",dist:"10",shift:"15"};
   var vsTouched = false, mode = "manual", bearing = null, lastBeta = null;
-  var KEY = "upwind-calc-v2";
+  var KEY = "upwind-calc-v3";
 
   function load(){
     var saved = null;
@@ -308,25 +309,54 @@ a{color:var(--sea)}
   var names = {motor:"מנוע ישר", two:"שני קטעים במפרשים", legmotor:"קטע במפרשים ואז מנוע", direct:"מפרשים ישר ליעד"};
 
   function calc(){
-    var awa = num("awa"), aws = num("aws"), vm = num("vm"), vs = num("vs"), P = num("pt"), d = num("dist"), S = num("shift");
+    var awa = num("awa"), aws = num("aws"), vm = num("vm"), vs = num("vs"), Pa = num("pt"), d = num("dist"), S = num("shift");
+    var isTWS = $("wst").value === "T";
+    $("awsLabel").firstChild.nodeValue = isTWS ? "עוצמת רוח (TWS)" : "עוצמת רוח (AWS)";
     var windRight = $("side").value === "R";
     var turn = windRight ? "שמאלה" : "ימינה";
-    if (!(awa>=0 && awa<=180) || !(vm>0) || !(vs>0) || !(P>=20 && P<=80) || !(d>0) || !(S>=0)){
+    if (!(awa>=0 && awa<=180) || !(vm>0) || !(vs>0) || !(Pa>=15 && Pa<=80) || !(d>0) || !(S>=0)){
       $("verdict").className = "verdict r";
-      $("verdict").innerHTML = '<p class="vtext">חסר נתון או שהוא מחוץ לטווח. בדקו: זווית רוח 0–180, מהירויות מעל 0, זווית לרוח עם מפרשים 20–80.</p>';
+      $("verdict").innerHTML = '<p class="vtext">חסר נתון או שהוא מחוץ לטווח. בדקו: זווית רוח 0–180, מהירויות מעל 0, זווית צמודה 15–80.</p>';
       $("chart").innerHTML = ""; $("opts").innerHTML = ""; $("derived").innerHTML = ""; $("thr").innerHTML = "";
       lastBeta = null; return;
     }
 
-    var beta, tws = null;
-    if (aws > 0){
+    // true wind angle off the line (beta) and true wind speed (tws)
+    var beta, tws = null, inconsistent = false;
+    if (aws > 0 && !isTWS){
       var fx = aws*Math.cos(awa*R) - vm, fy = aws*Math.sin(awa*R);
       beta = Math.atan2(fy, fx)/R; tws = Math.hypot(fx, fy);
+    } else if (aws > 0){
+      tws = aws;
+      var k = vm*Math.sin(awa*R)/tws;
+      if (k > 1){ inconsistent = true; beta = awa; } else beta = awa + Math.asin(k)/R;
     } else beta = awa;
     lastBeta = beta;
 
-    var awaTarget = tws ? Math.round(Math.atan2(tws*Math.sin(P*R), tws*Math.cos(P*R) + vs)/R) : null;
-    $("derived").innerHTML = "רוח אמיתית: " + Math.round(beta) + "° מהקו ליעד" + (tws ? ", " + f1(tws) + " קשר." : ". (בלי עוצמת רוח זו הערכה שמרנית.)");
+    // close-hauled AWA on the instrument -> true angle P when sailing at vs
+    var P, noSail = false;
+    if (tws){
+      var kp = vs*Math.sin(Pa*R)/tws;
+      if (kp > 1) noSail = true; else P = Pa + Math.asin(kp)/R;
+    } else P = Pa;
+    if (!noSail && P >= 88) noSail = true;
+
+    if (inconsistent){
+      $("verdict").className = "verdict r";
+      $("verdict").innerHTML = '<p class="vtext">הנתונים לא מסתדרים: במהירות ' + f1(vm) + ' קשר ורוח אמיתית של ' + f1(tws) + ' קשר, המכשיר לא יכול להראות ' + Math.round(awa) + '°. בדקו אם המכשיר מציג TWS או AWS (בהגדרות סירה ותרחיש).</p>';
+      $("chart").innerHTML = ""; $("opts").innerHTML = ""; $("derived").innerHTML = ""; $("thr").innerHTML = "";
+      return;
+    }
+
+    $("derived").innerHTML = "רוח אמיתית: " + Math.round(beta) + "° מהקו ליעד" + (tws ? ", " + f1(tws) + " קשר." : ". (בלי עוצמת רוח זו הערכה שמרנית.)") +
+      (tws && !noSail ? " שיוט צמוד ב־" + Math.round(Pa) + "° במכשיר = " + Math.round(P) + "° לרוח האמיתית." : "");
+
+    if (noSail){
+      $("verdict").className = "verdict r";
+      $("verdict").innerHTML = '<div class="vhead"><span class="light"></span><span class="vtitle">מנוע ישר ליעד</span></div><p class="vtext">ברוח של ' + f1(tws) + ' קשר הסירה לא תגיע ל־' + Math.round(Pa) + '° במכשיר במהירות ' + f1(vs) + ' קשר. רוב הרוח במכשיר תיווצר מהמהירות שלכם. מנוע ישר, עם ראשי לייצוב.</p>';
+      $("chart").innerHTML = ""; $("opts").innerHTML = "";
+      drawThreshold(vm, vs, d, null); save(); return;
+    }
 
     var res = solve(d, beta, P, vm, vs);
     var Tm = res.motor.time;
@@ -343,8 +373,10 @@ a{color:var(--sea)}
     var v = $("verdict"), cls, title, text;
     if (!bestPlan || gain <= 0){
       cls = "r"; title = "מנוע ישר ליעד";
-      var need = res.two ? vm*res.two.dist/d : vm;
-      text = "בנתונים האלה הסטייה לא משתלמת. כדי שתשתלם צריך בערך " + f1(need) + " קשר עם מפרשים.";
+      var aNeed = P - beta;
+      if (aNeed > 0 && aNeed < 85){
+        text = "כדי להגיע ל־" + Math.round(Pa) + "° במכשיר צריך לסטות " + Math.round(aNeed) + "° מהיעד. בסטייה כזו צריך יותר מ־" + f1(vm/Math.cos(aNeed*R)) + " קשר עם מפרשים כדי שישתלם.";
+      } else text = "בנתונים האלה הסטייה לא משתלמת.";
     } else {
       var worstCost = bestPlan.worst.time - Tm;
       var riskTxt = worstCost <= 0 ? "נמוך" : worstCost <= Tm*0.10 ? "בינוני" : "גבוה";
@@ -359,7 +391,6 @@ a{color:var(--sea)}
         title = "סטו " + turn + " " + Math.round(bestPlan.a) + "°, ואז מנוע ישר";
         text = "שוטו כ־" + f1(bestPlan.x) + " מייל, עד שהיעד נמצא " + Math.round(bestPlan.phi) + "° מהחרטום. משם מנוע ישר ליעד: " + f1(bestPlan.rem) + " מייל.";
       }
-      if (awaTarget !== null) text += " במכשיר תראו בערך " + awaTarget + "° AWA.";
       text += " סיכון: " + riskTxt + ".";
     }
     var html = '<div class="vhead"><span class="light"></span><span class="vtitle">' + title + '</span></div><p class="vtext">' + text + '</p>';
@@ -521,10 +552,7 @@ a{color:var(--sea)}
     var dev = relAngle(live.cog, bearing);
     $("vs").value = f1(live.sog); vsTouched = true;
     var msg = "נשמר: " + f1(live.sog) + " קשר עם מפרשים, בסטייה של " + Math.round(dev) + "°.";
-    if (lastBeta !== null && dev > 2){
-      var p = Math.round(dev + lastBeta);
-      if (p >= 20 && p <= 80){ $("pt").value = p; msg += " הזווית לרוח עודכנה ל־" + p + "°."; }
-    }
+
     $("autoMsg").textContent = msg;
     calc(); showVmc();
   });
@@ -535,7 +563,7 @@ a{color:var(--sea)}
   });
 
   // ---------- version check ----------
-  var APP_VERSION = "2026-10-04.3";
+  var APP_VERSION = "2026-10-04.4";
   $("ver").textContent = "גרסה " + APP_VERSION;
   function checkUpdate(){
     if (!/^https?:$/.test(location.protocol) || !navigator.onLine) return;
